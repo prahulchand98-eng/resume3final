@@ -9,6 +9,7 @@ import {
   TrendingUp, FileText, ArrowRight, Sparkles, Target, Award, Mail, Copy, Users, BarChart2, Ticket
 } from 'lucide-react';
 import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
 import { UserProfile, HistoryItem } from '@/lib/types';
 
 const QUOTES = [
@@ -233,10 +234,17 @@ function DashboardInner() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <StatCard
             icon={Zap}
-            label="Credits Left"
+            label="Resume Credits"
             value={user.credits}
             sub={`of ${user.creditsLimit} total`}
             color={creditPercent < 20 ? 'bg-red-500' : 'bg-primary-600'}
+          />
+          <StatCard
+            icon={Target}
+            label="ATS Credits"
+            value={user.atsCredits >= 9999 ? '∞' : user.atsCredits}
+            sub={user.atsCredits >= 9999 ? 'Unlimited' : `of ${user.atsCreditsLimit} total`}
+            color={user.atsCredits === 0 ? 'bg-red-500' : 'bg-emerald-600'}
           />
           <StatCard
             icon={FileText}
@@ -246,19 +254,43 @@ function DashboardInner() {
             color="bg-violet-600"
           />
           <StatCard
-            icon={TrendingUp}
-            label="ATS Optimized"
-            value={`${history.length > 0 ? '100' : '0'}%`}
-            sub="of your resumes"
-            color="bg-emerald-600"
-          />
-          <StatCard
             icon={Award}
             label="Current Plan"
             value={planLabel}
             sub={user.plan === 'free' ? 'Upgrade for more' : 'Active'}
             color="bg-amber-500"
           />
+        </div>
+
+        {/* Services row */}
+        <div className="grid md:grid-cols-2 gap-4">
+          <Link href="/create" className="group flex items-center gap-4 bg-white border border-gray-100 rounded-2xl p-5 shadow-sm hover:shadow-md hover:border-primary-200 transition-all">
+            <div className="w-12 h-12 bg-primary-600 rounded-2xl flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+              <Zap size={22} className="text-white" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h3 className="font-bold text-gray-900">Resume Tailor</h3>
+              <p className="text-sm text-gray-500">Paste a job description and get an AI-tailored resume in seconds</p>
+            </div>
+            <div className="shrink-0">
+              <span className="text-xs font-semibold bg-primary-50 text-primary-700 px-2.5 py-1 rounded-full">{user.credits} credits left</span>
+            </div>
+          </Link>
+
+          <Link href="/ats-check" className="group flex items-center gap-4 bg-white border border-gray-100 rounded-2xl p-5 shadow-sm hover:shadow-md hover:border-emerald-200 transition-all">
+            <div className="w-12 h-12 bg-emerald-600 rounded-2xl flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+              <Target size={22} className="text-white" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h3 className="font-bold text-gray-900">VicksATS Checker</h3>
+              <p className="text-sm text-gray-500">Score your resume against any job description like a real ATS system</p>
+            </div>
+            <div className="shrink-0">
+              <span className="text-xs font-semibold bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-full">
+                {user.atsCredits >= 9999 ? 'Unlimited' : `${user.atsCredits} checks left`}
+              </span>
+            </div>
+          </Link>
         </div>
 
         {/* Main content grid */}
@@ -462,6 +494,7 @@ function DashboardInner() {
           </div>
         )}
       </main>
+      <Footer />
     </div>
   );
 }

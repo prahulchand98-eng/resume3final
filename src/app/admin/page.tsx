@@ -5,10 +5,20 @@ import { useRouter } from 'next/navigation';
 import {
   Users, FileText, DollarSign, Target, Search,
   ChevronLeft, ChevronRight, Check, X, Edit2, Save,
-  Ticket, Plus, Trash2, Copy, RefreshCw, TrendingUp, Calendar
+  Ticket, Plus, Trash2, Copy, RefreshCw, TrendingUp, Calendar,
+  MessageSquare, Star, Bell
 } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import { UserProfile } from '@/lib/types';
+
+interface Suggestion {
+  id: string;
+  message: string;
+  rating: number | null;
+  isRead: boolean;
+  createdAt: string;
+  user: { email: string; name: string | null };
+}
 
 interface PeriodStats { users: number; resumes: number; ats: number }
 
@@ -140,7 +150,9 @@ export default function AdminPage() {
   const [couponSuccess, setCouponSuccess] = useState('');
   const [creatingCoupon, setCreatingCoupon] = useState(false);
   const [copiedCode, setCopiedCode] = useState<string | null>(null);
-  const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'coupons'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'users' | 'coupons' | 'suggestions'>('overview');
+  const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   const fetchCoupons = () =>
     fetch('/api/admin/coupons').then((r) => r.json()).then((data) => {
@@ -157,6 +169,12 @@ export default function AdminPage() {
       }).then((s) => { if (s) setStats(s); setLoading(false); });
     });
     fetchCoupons();
+    fetch('/api/admin/suggestions').then((r) => r.json()).then((data) => {
+      if (Array.isArray(data)) {
+        setSuggestions(data);
+        setUnreadCount(data.filter((s: Suggestion) => !s.isRead).length);
+      }
+    });
   }, [router]);
 
   useEffect(() => {
@@ -206,6 +224,12 @@ export default function AdminPage() {
     setCoupons((prev) => prev.filter((c) => c.id !== id));
   };
 
+  const markRead = async (id: string) => {
+    await fetch('/api/admin/suggestions', { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) });
+    setSuggestions((prev) => prev.map((s) => s.id === id ? { ...s, isRead: true } : s));
+    setUnreadCount((c) => Math.max(0, c - 1));
+  };
+
   const copyCouponCode = (code: string) => {
     navigator.clipboard.writeText(code);
     setCopiedCode(code);
@@ -233,13 +257,18 @@ export default function AdminPage() {
             <p className="text-gray-500 text-sm mt-1">Analytics, users, and coupons</p>
           </div>
           <div className="flex gap-2">
-            {(['overview', 'users', 'coupons'] as const).map((tab) => (
+            {(['overview', 'users', 'coupons', 'suggestions'] as const).map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`px-4 py-2 rounded-xl text-sm font-semibold capitalize transition-colors ${activeTab === tab ? 'bg-primary-600 text-white' : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'}`}
+                className={`relative px-4 py-2 rounded-xl text-sm font-semibold capitalize transition-colors ${activeTab === tab ? 'bg-primary-600 text-white' : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'}`}
               >
                 {tab}
+                {tab === 'suggestions' && unreadCount > 0 && (
+                  <span className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
+                    {unreadCount}
+                  </span>
+                )}
               </button>
             ))}
           </div>
@@ -532,6 +561,55 @@ export default function AdminPage() {
                   </tbody>
                 </table>
               </div>
+            )}
+          </div>
+        )}
+        {/* ── SUGGESTIONS TAB ── */}
+        {activeTab === 'suggestions' && (
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+            <div className="p-5 border-b border-gray-100 flex items-center gap-2">
+              <Bell size={18} className="text-primary-600" />
+              <h2 className="font-bold text-gray-900 flex-1">User Suggestions & Feedback</h2>
+              <span className="text-xs text-gray-400">{suggestions.length} total · {unreadCount} unread</span>
+            </div>
+            {suggestions.length === 0 ? (
+              <div className="text-center py-16 text-gray-400">
+                <MessageSquare size={32} className="mx-auto mb-3 opacity-30" />
+                <p className="text-sm">No suggestions yet.</p>
+              </div>
+            ) : (
+              <ul className="divide-y divide-gray-50">
+                {suggestions.map((s) => (
+                  <li key={s.id} className={`p-5 transition-colors ${s.isRead ? 'bg-white' : 'bg-blue-50'}`}>
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <p className="text-sm font-semibold text-gray-800">{s.user.name || s.user.email}</p>
+                          {s.user.name && <p className="text-xs text-gray-400">{s.user.email}</p>}
+                          {!s.isRead && <span className="text-[10px] bg-blue-500 text-white px-1.5 py-0.5 rounded-full font-bold">NEW</span>}
+                          {s.rating && (
+                            <div className="flex gap-0.5">
+                              {[1,2,3,4,5].map((star) => (
+                                <Star key={star} size={12} className={s.rating! >= star ? 'text-amber-400 fill-amber-400' : 'text-gray-200'} />
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                        <p className="text-sm text-gray-600 whitespace-pre-wrap">{s.message}</p>
+                        <p className="text-xs text-gray-400 mt-2">{new Date(s.createdAt).toLocaleString()}</p>
+                      </div>
+                      {!s.isRead && (
+                        <button
+                          onClick={() => markRead(s.id)}
+                          className="shrink-0 flex items-center gap-1 text-xs text-gray-400 hover:text-primary-600 border border-gray-200 hover:border-primary-300 px-2.5 py-1.5 rounded-lg transition-colors"
+                        >
+                          <Check size={12} /> Mark read
+                        </button>
+                      )}
+                    </div>
+                  </li>
+                ))}
+              </ul>
             )}
           </div>
         )}

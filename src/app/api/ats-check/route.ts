@@ -41,6 +41,10 @@ export async function POST(req: NextRequest) {
   const user = await prisma.user.findUnique({ where: { id: session.userId } });
   if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 });
 
+  if (!user.emailVerified) {
+    return NextResponse.json({ error: 'Please verify your email before using this service.', code: 'EMAIL_NOT_VERIFIED' }, { status: 403 });
+  }
+
   if (user.atsCredits <= 0) {
     return NextResponse.json(
       { error: 'No ATS check credits remaining. Upgrade your plan.', code: 'NO_ATS_CREDITS' },

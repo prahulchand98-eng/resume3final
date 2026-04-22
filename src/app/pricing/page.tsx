@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { CheckCircle, Zap, Star, AlertCircle } from 'lucide-react';
 import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
 import { UserProfile } from '@/lib/types';
 
 const PLANS = [
@@ -232,15 +233,16 @@ export default function PricingPage() {
 
   if (user) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-gray-50 flex flex-col">
         <Navbar user={user} />
         {content}
+        <Footer />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
       <header className="border-b border-gray-200 bg-white h-16 flex items-center px-6">
         <Link href="/" className="flex items-center gap-2">
           <div className="bg-primary-600 text-white p-1.5 rounded-lg"><Zap size={18} /></div>
@@ -248,6 +250,7 @@ export default function PricingPage() {
         </Link>
       </header>
       {content}
+      <Footer />
     </div>
   );
 }

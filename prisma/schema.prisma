@@ -31,6 +31,7 @@ model User {
   subscription             Subscription?
   resetTokens              PasswordResetToken[]
   referralsMade            Referral[]           @relation("ReferrerRelation")
+  suggestions              Suggestion[]
 }
 
 model PasswordResetToken {
@@ -82,6 +83,16 @@ model Referral {
   creditGranted  Boolean  @default(false)
   createdAt      DateTime @default(now())
   referrer       User     @relation("ReferrerRelation", fields: [referrerId], references: [id], onDelete: Cascade)
+}
+
+model Suggestion {
+  id        String   @id @default(cuid())
+  userId    String
+  message   String
+  rating    Int?
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Coupon {

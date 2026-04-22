@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Zap, FileText, Download, Clock, Star, CheckCircle, ArrowRight } from 'lucide-react';
+import Footer from '@/components/Footer';
 
 export default function LandingPage() {
   return (
@@ -142,25 +143,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="border-t border-gray-200 py-8 px-6">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-gray-400">
-          <div className="flex items-center gap-2">
-            <div className="bg-primary-600 text-white p-1 rounded">
-              <Zap size={14} />
-            </div>
-            <span className="font-semibold text-gray-700">VicksResume</span>
-          </div>
-          <p>© {new Date().getFullYear()} VicksResume. All rights reserved.</p>
-          <div className="flex gap-4">
-            <Link href="/pricing" className="hover:text-gray-600">Pricing</Link>
-            <Link href="/privacy" className="hover:text-gray-600">Privacy</Link>
-            <Link href="/terms" className="hover:text-gray-600">Terms</Link>
-            <Link href="/login" className="hover:text-gray-600">Login</Link>
-            <Link href="/signup" className="hover:text-gray-600">Sign Up</Link>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }
