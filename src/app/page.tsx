@@ -11,7 +11,7 @@ export default function LandingPage() {
             <div className="bg-primary-600 text-white p-1.5 rounded-lg">
               <Zap size={18} />
             </div>
-            <span className="font-bold text-gray-900 text-lg">ResumeTailor AI</span>
+            <span className="font-bold text-gray-900 text-lg">VicksResume</span>
           </div>
           <div className="flex items-center gap-3">
             <Link href="/pricing" className="text-sm text-gray-600 hover:text-gray-900">Pricing</Link>
@@ -149,9 +149,9 @@ export default function LandingPage() {
             <div className="bg-primary-600 text-white p-1 rounded">
               <Zap size={14} />
             </div>
-            <span className="font-semibold text-gray-700">ResumeTailor AI</span>
+            <span className="font-semibold text-gray-700">VicksResume</span>
           </div>
-          <p>© {new Date().getFullYear()} ResumeTailor AI. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} VicksResume. All rights reserved.</p>
           <div className="flex gap-4">
             <Link href="/pricing" className="hover:text-gray-600">Pricing</Link>
             <Link href="/privacy" className="hover:text-gray-600">Privacy</Link>

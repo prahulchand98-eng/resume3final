@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
-import { LayoutDashboard, Clock, Star, LogOut, Menu, X, Zap, Sparkles } from 'lucide-react';
+import { LayoutDashboard, Clock, Star, LogOut, Menu, X, Zap, Sparkles, Target } from 'lucide-react';
 import { UserProfile } from '@/lib/types';
 
 interface NavbarProps {
@@ -30,6 +30,7 @@ export default function Navbar({ user }: NavbarProps) {
   const navLinks = [
     { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { href: '/create', label: 'Tailor Resume', icon: Sparkles },
+    { href: '/ats-check', label: 'VicksATS', icon: Target },
     { href: '/history', label: 'History', icon: Clock },
     { href: '/pricing', label: 'Pricing', icon: Star },
   ];
@@ -46,7 +47,7 @@ export default function Navbar({ user }: NavbarProps) {
             <div className="bg-primary-600 text-white p-1.5 rounded-lg">
               <Zap size={18} />
             </div>
-            <span className="font-bold text-gray-900 text-lg">ResumeTailor</span>
+            <span className="font-bold text-gray-900 text-lg">VicksResume</span>
           </Link>
 
           {/* Desktop nav */}

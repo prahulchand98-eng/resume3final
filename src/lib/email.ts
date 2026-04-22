@@ -15,7 +15,7 @@ function createTransport() {
   });
 }
 
-const FROM = process.env.EMAIL_FROM || 'ResumeTailor AI <noreply@resumetailor.ai>';
+const FROM = process.env.EMAIL_FROM || 'VicksResume <noreply@resumetailor.ai>';
 
 export async function sendPasswordResetEmail(to: string, resetUrl: string) {
   const transport = createTransport();
@@ -27,7 +27,7 @@ export async function sendPasswordResetEmail(to: string, resetUrl: string) {
     <body style="font-family:system-ui,sans-serif;background:#f9fafb;margin:0;padding:40px 20px;">
       <div style="max-width:480px;margin:0 auto;background:white;border-radius:16px;border:1px solid #e5e7eb;overflow:hidden;">
         <div style="background:#4f46e5;padding:28px 32px;">
-          <h1 style="color:white;margin:0;font-size:22px;font-weight:700;">ResumeTailor AI</h1>
+          <h1 style="color:white;margin:0;font-size:22px;font-weight:700;">VicksResume</h1>
         </div>
         <div style="padding:32px;">
           <h2 style="margin:0 0 8px;font-size:20px;color:#111827;">Reset your password</h2>
@@ -47,7 +47,7 @@ export async function sendPasswordResetEmail(to: string, resetUrl: string) {
           </p>
         </div>
         <div style="background:#f9fafb;padding:16px 32px;border-top:1px solid #e5e7eb;">
-          <p style="color:#9ca3af;font-size:12px;margin:0;">© ${new Date().getFullYear()} ResumeTailor AI</p>
+          <p style="color:#9ca3af;font-size:12px;margin:0;">© ${new Date().getFullYear()} VicksResume</p>
         </div>
       </div>
     </body>
@@ -67,7 +67,7 @@ export async function sendPasswordResetEmail(to: string, resetUrl: string) {
   await transport.sendMail({
     from: FROM,
     to,
-    subject: 'Reset your ResumeTailor AI password',
+    subject: 'Reset your VicksResume password',
     html,
   });
 }

@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { Zap } from 'lucide-react';
 
-export const metadata = { title: 'Terms of Service – ResumeTailor AI' };
+export const metadata = { title: 'Terms of Service – VicksResume' };
 
 export default function TermsPage() {
   return (
@@ -9,7 +9,7 @@ export default function TermsPage() {
       <header className="border-b border-gray-200 bg-white h-16 flex items-center px-6">
         <Link href="/" className="flex items-center gap-2">
           <div className="bg-primary-600 text-white p-1.5 rounded-lg"><Zap size={18} /></div>
-          <span className="font-bold text-gray-900 text-lg">ResumeTailor AI</span>
+          <span className="font-bold text-gray-900 text-lg">VicksResume</span>
         </Link>
       </header>
 
@@ -20,12 +20,12 @@ export default function TermsPage() {
         <div className="space-y-8 text-gray-600 leading-relaxed">
           <section>
             <h2 className="text-xl font-bold text-gray-900 mb-3">1. Acceptance of Terms</h2>
-            <p>By creating an account or using ResumeTailor AI, you agree to these Terms of Service. If you do not agree, do not use the service.</p>
+            <p>By creating an account or using VicksResume, you agree to these Terms of Service. If you do not agree, do not use the service.</p>
           </section>
 
           <section>
             <h2 className="text-xl font-bold text-gray-900 mb-3">2. Description of Service</h2>
-            <p>ResumeTailor AI is an AI-powered resume tailoring service. You provide a resume and a job description, and our service generates a tailored version of your resume to better match the job requirements. The service is provided "as is" and results may vary.</p>
+            <p>VicksResume is an AI-powered resume tailoring service. You provide a resume and a job description, and our service generates a tailored version of your resume to better match the job requirements. The service is provided "as is" and results may vary.</p>
           </section>
 
           <section>
@@ -68,12 +68,12 @@ export default function TermsPage() {
 
           <section>
             <h2 className="text-xl font-bold text-gray-900 mb-3">7. Disclaimer of Warranties</h2>
-            <p>ResumeTailor AI is provided "as is" without warranties of any kind. We do not guarantee that using our service will result in job interviews, employment, or any specific outcome. AI-generated content should be reviewed by you before submission.</p>
+            <p>VicksResume is provided "as is" without warranties of any kind. We do not guarantee that using our service will result in job interviews, employment, or any specific outcome. AI-generated content should be reviewed by you before submission.</p>
           </section>
 
           <section>
             <h2 className="text-xl font-bold text-gray-900 mb-3">8. Limitation of Liability</h2>
-            <p>To the fullest extent permitted by law, ResumeTailor AI shall not be liable for any indirect, incidental, special, or consequential damages arising from your use of the service. Our total liability to you shall not exceed the amount you paid us in the past 3 months.</p>
+            <p>To the fullest extent permitted by law, VicksResume shall not be liable for any indirect, incidental, special, or consequential damages arising from your use of the service. Our total liability to you shall not exceed the amount you paid us in the past 3 months.</p>
           </section>
 
           <section>

@@ -46,7 +46,7 @@ export default function SignupPage() {
         <div className="bg-primary-600 text-white p-1.5 rounded-lg">
           <Zap size={18} />
         </div>
-        <span className="font-bold text-gray-900 text-lg">ResumeTailor AI</span>
+        <span className="font-bold text-gray-900 text-lg">VicksResume</span>
       </Link>
 
       {/* Free trial badge */}

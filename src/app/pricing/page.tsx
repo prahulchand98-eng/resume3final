@@ -14,9 +14,9 @@ const PLANS = [
     credits: 50,
     features: [
       '50 tailored resumes/month',
+      '0 VicksATS checks/month',
       'PDF & Word download',
       '7-day history',
-      'Saved resume templates',
       'Basic resume builder',
     ],
     highlight: false,
@@ -29,9 +29,9 @@ const PLANS = [
     credits: 150,
     features: [
       '150 tailored resumes/month',
+      '100 VicksATS checks/month',
       'PDF & Word download',
       '7-day history',
-      'Saved resume templates',
       'Advanced resume builder',
       'Priority AI processing',
     ],
@@ -45,9 +45,9 @@ const PLANS = [
     credits: 800,
     features: [
       '800 tailored resumes/month',
+      'Unlimited VicksATS checks',
       'PDF & Word download',
       '7-day history',
-      'Unlimited saved templates',
       'Advanced resume builder',
       'Priority AI processing',
       'Early access to new features',
@@ -127,7 +127,7 @@ export default function PricingPage() {
         </div>
         <p className="text-4xl font-extrabold text-primary-900 mb-1">$0</p>
         <p className="text-primary-700 font-medium mb-3">3 resumes • No credit card required</p>
-        <p className="text-sm text-primary-600">Perfect for trying out ResumeTailor AI</p>
+        <p className="text-sm text-primary-600">Perfect for trying out VicksResume</p>
         {!user && (
           <Link href="/signup" className="mt-4 inline-block bg-primary-600 text-white px-6 py-2.5 rounded-lg font-semibold hover:bg-primary-700 transition-colors">
             Get Started Free
@@ -244,7 +244,7 @@ export default function PricingPage() {
       <header className="border-b border-gray-200 bg-white h-16 flex items-center px-6">
         <Link href="/" className="flex items-center gap-2">
           <div className="bg-primary-600 text-white p-1.5 rounded-lg"><Zap size={18} /></div>
-          <span className="font-bold text-gray-900 text-lg">ResumeTailor AI</span>
+          <span className="font-bold text-gray-900 text-lg">VicksResume</span>
         </Link>
       </header>
       {content}

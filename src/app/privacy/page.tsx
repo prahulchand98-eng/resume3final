@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { Zap } from 'lucide-react';
 
-export const metadata = { title: 'Privacy Policy – ResumeTailor AI' };
+export const metadata = { title: 'Privacy Policy – VicksResume' };
 
 export default function PrivacyPage() {
   return (
@@ -9,7 +9,7 @@ export default function PrivacyPage() {
       <header className="border-b border-gray-200 bg-white h-16 flex items-center px-6">
         <Link href="/" className="flex items-center gap-2">
           <div className="bg-primary-600 text-white p-1.5 rounded-lg"><Zap size={18} /></div>
-          <span className="font-bold text-gray-900 text-lg">ResumeTailor AI</span>
+          <span className="font-bold text-gray-900 text-lg">VicksResume</span>
         </Link>
       </header>
 
@@ -26,7 +26,7 @@ export default function PrivacyPage() {
           <section>
             <h2 className="text-xl font-bold text-gray-900 mb-3">2. How We Use Your Information</h2>
             <ul className="list-disc pl-5 space-y-2">
-              <li>To provide and operate the ResumeTailor AI service</li>
+              <li>To provide and operate the VicksResume service</li>
               <li>To generate AI-tailored resumes using your resume data and job descriptions</li>
               <li>To send transactional emails such as password reset links</li>
               <li>To process payments and manage your subscription via Stripe</li>

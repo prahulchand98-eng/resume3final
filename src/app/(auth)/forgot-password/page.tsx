@@ -34,7 +34,7 @@ export default function ForgotPasswordPage() {
     <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-4">
       <Link href="/" className="flex items-center gap-2 mb-8">
         <div className="bg-primary-600 text-white p-1.5 rounded-lg"><Zap size={18} /></div>
-        <span className="font-bold text-gray-900 text-lg">ResumeTailor AI</span>
+        <span className="font-bold text-gray-900 text-lg">VicksResume</span>
       </Link>
 
       <div className="card w-full max-w-sm">

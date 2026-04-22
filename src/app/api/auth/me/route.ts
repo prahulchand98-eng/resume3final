@@ -21,6 +21,8 @@ export async function GET(req: NextRequest) {
     name: user.name,
     credits: user.credits,
     creditsLimit: user.creditsLimit,
+    atsCredits: user.atsCredits,
+    atsCreditsLimit: user.atsCreditsLimit,
     plan: user.plan,
   });
 }

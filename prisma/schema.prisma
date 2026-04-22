@@ -8,13 +8,15 @@ generator client {
 }
 
 model User {
-  id           String               @id @default(cuid())
-  email        String               @unique
-  password     String
-  name         String?
-  credits      Int                  @default(3)
-  creditsLimit Int                  @default(3)
-  plan         String               @default("free")
+  id              String               @id @default(cuid())
+  email           String               @unique
+  password        String
+  name            String?
+  credits         Int                  @default(3)
+  creditsLimit    Int                  @default(3)
+  atsCredits      Int                  @default(3)
+  atsCreditsLimit Int                  @default(3)
+  plan            String               @default("free")
   createdAt    DateTime             @default(now())
   updatedAt    DateTime             @updatedAt
   savedResumes SavedResume[]

@@ -37,6 +37,8 @@ export async function POST(req: NextRequest) {
         name: name?.trim() || null,
         credits: 3,
         creditsLimit: 3,
+        atsCredits: 3,
+        atsCreditsLimit: 3,
         plan: 'free',
       },
     });
@@ -45,7 +47,12 @@ export async function POST(req: NextRequest) {
     const cookie = createAuthCookie(token);
 
     const res = NextResponse.json({
-      user: { id: user.id, email: user.email, name: user.name, credits: user.credits, creditsLimit: user.creditsLimit, plan: user.plan },
+      user: {
+        id: user.id, email: user.email, name: user.name,
+        credits: user.credits, creditsLimit: user.creditsLimit,
+        atsCredits: user.atsCredits, atsCreditsLimit: user.atsCreditsLimit,
+        plan: user.plan,
+      },
     });
     res.cookies.set(cookie);
     return res;
