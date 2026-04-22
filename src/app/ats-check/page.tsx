@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect, useState, Suspense } from 'react';
+import { useEffect, useState, useRef, Suspense } from 'react';
 import Link from 'next/link';
-import { AlertCircle, Target, CheckCircle, XCircle, TrendingUp, Zap, ArrowRight, FileText } from 'lucide-react';
+import { AlertCircle, Target, CheckCircle, XCircle, TrendingUp, Zap, ArrowRight, FileText, Upload, Loader2 } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import { UserProfile } from '@/lib/types';
 
@@ -37,7 +37,7 @@ function ScoreBar({ label, score }: { label: string; score: number }) {
   );
 }
 
-function ScoreRing({ score }: { score: number }) {
+function ScoreRing({ score, onImprove }: { score: number; onImprove: () => void }) {
   const r = 54;
   const circ = 2 * Math.PI * r;
   const offset = circ - (score / 100) * circ;
@@ -46,7 +46,7 @@ function ScoreRing({ score }: { score: number }) {
   const label = score >= 75 ? 'Great Match' : score >= 50 ? 'Needs Work' : 'Poor Match';
 
   return (
-    <div className="flex flex-col items-center gap-2">
+    <div className="flex flex-col items-center gap-3">
       <div className="relative w-36 h-36">
         <svg className="w-36 h-36 -rotate-90" viewBox="0 0 128 128">
           <circle cx="64" cy="64" r={r} fill="none" stroke="#e5e7eb" strokeWidth="10" />
@@ -59,7 +59,23 @@ function ScoreRing({ score }: { score: number }) {
           <span className="text-xs text-gray-400">/100</span>
         </div>
       </div>
-      <span className="text-sm font-bold px-4 py-1.5 rounded-full" style={{ background: bg, color }}>{label}</span>
+      {/* Badge + blinking Improve More button */}
+      <div className="flex items-center gap-2 flex-wrap justify-center">
+        <span className="text-sm font-bold px-4 py-1.5 rounded-full" style={{ background: bg, color }}>{label}</span>
+        <button
+          onClick={onImprove}
+          className="text-sm font-bold px-4 py-1.5 rounded-full bg-primary-600 text-white hover:bg-primary-700 transition-colors"
+          style={{ animation: 'blink-glow 1.4s ease-in-out infinite' }}
+        >
+          ✨ Improve More
+        </button>
+      </div>
+      <style>{`
+        @keyframes blink-glow {
+          0%, 100% { box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.7); opacity: 1; }
+          50% { box-shadow: 0 0 12px 4px rgba(99, 102, 241, 0.5); opacity: 0.85; }
+        }
+      `}</style>
     </div>
   );
 }
@@ -69,18 +85,42 @@ function ATSCheckInner() {
   const [loading, setLoading] = useState(true);
   const [jobDescription, setJobDescription] = useState('');
   const [resume, setResume] = useState('');
+  const [resumeMode, setResumeMode] = useState<'paste' | 'upload'>('paste');
+  const [uploadName, setUploadName] = useState('');
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState('');
   const [checking, setChecking] = useState(false);
   const [result, setResult] = useState<ATSResult | null>(null);
   const [error, setError] = useState('');
+  const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     fetch('/api/auth/me').then(r => r.json()).then(u => { setUser(u); setLoading(false); });
   }, []);
 
+  const handleUpload = async (file: File) => {
+    setUploading(true);
+    setUploadError('');
+    setResume('');
+    setUploadName(file.name);
+    const formData = new FormData();
+    formData.append('file', file);
+    try {
+      const res = await fetch('/api/upload', { method: 'POST', body: formData });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      setResume(data.text);
+    } catch (err: unknown) {
+      setUploadError(err instanceof Error ? err.message : 'Upload failed');
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const handleCheck = async () => {
     setError('');
     if (!jobDescription.trim()) { setError('Please enter the job description.'); return; }
-    if (!resume.trim()) { setError('Please paste your resume text.'); return; }
+    if (!resume.trim()) { setError('Please provide your resume.'); return; }
     if (jobDescription.length < 50) { setError('Please provide a more detailed job description.'); return; }
 
     setChecking(true);
@@ -105,6 +145,10 @@ function ATSCheckInner() {
     } finally {
       setChecking(false);
     }
+  };
+
+  const scrollToImprove = () => {
+    document.getElementById('improve-cta')?.scrollIntoView({ behavior: 'smooth' });
   };
 
   if (loading || !user) {
@@ -136,15 +180,15 @@ function ATSCheckInner() {
           <p className="text-violet-200 text-lg max-w-2xl mx-auto mb-6">
             Paste your resume and job description. Our AI scans for keyword matches, skill gaps, and ATS compatibility — in seconds.
           </p>
-          <div className="flex items-center justify-center gap-2 text-sm">
+          <div className="flex items-center justify-center gap-2 text-sm flex-wrap">
             <span className="bg-white/10 border border-white/20 px-4 py-2 rounded-full">
               {isUnlimited ? '∞ Unlimited checks' : `${atsCreditsLeft} check${atsCreditsLeft !== 1 ? 's' : ''} remaining`}
             </span>
-            {user.plan === 'free' || user.plan === 'basic' ? (
+            {(user.plan === 'free' || user.plan === 'basic') && (
               <Link href="/pricing" className="bg-white text-violet-700 px-4 py-2 rounded-full font-semibold hover:bg-violet-50 transition-colors">
                 Upgrade for more →
               </Link>
-            ) : null}
+            )}
           </div>
         </div>
       </div>
@@ -186,20 +230,80 @@ function ATSCheckInner() {
             <p className="text-xs text-gray-400 mt-1">{jobDescription.length.toLocaleString()} characters</p>
           </div>
 
-          {/* Resume */}
+          {/* Resume with upload/paste toggle */}
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
             <div className="flex items-center gap-2 mb-3">
               <span className="w-6 h-6 bg-violet-600 text-white text-xs font-bold rounded-full flex items-center justify-center shrink-0">2</span>
               <h2 className="font-bold text-gray-900">Your Resume</h2>
             </div>
-            <textarea
-              className="w-full border border-gray-200 rounded-xl p-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-violet-400 focus:border-transparent"
-              rows={12}
-              value={resume}
-              onChange={e => setResume(e.target.value)}
-              placeholder="Paste your resume text here (copy from Word, PDF, or type it out)..."
-            />
-            <p className="text-xs text-gray-400 mt-1">{resume.length.toLocaleString()} characters</p>
+
+            {/* Mode toggle */}
+            <div className="flex gap-2 mb-3">
+              <button
+                onClick={() => { setResumeMode('paste'); setResume(''); setUploadName(''); }}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors ${resumeMode === 'paste' ? 'bg-violet-50 border-violet-400 text-violet-700' : 'border-gray-200 text-gray-500 hover:border-gray-300'}`}
+              >
+                <FileText size={14} /> Paste Text
+              </button>
+              <button
+                onClick={() => { setResumeMode('upload'); setResume(''); }}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium border transition-colors ${resumeMode === 'upload' ? 'bg-violet-50 border-violet-400 text-violet-700' : 'border-gray-200 text-gray-500 hover:border-gray-300'}`}
+              >
+                <Upload size={14} /> Upload File
+              </button>
+            </div>
+
+            {resumeMode === 'paste' ? (
+              <>
+                <textarea
+                  className="w-full border border-gray-200 rounded-xl p-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-violet-400 focus:border-transparent"
+                  rows={10}
+                  value={resume}
+                  onChange={e => setResume(e.target.value)}
+                  placeholder="Paste your resume text here..."
+                />
+                <p className="text-xs text-gray-400 mt-1">{resume.length.toLocaleString()} characters</p>
+              </>
+            ) : (
+              <div className="space-y-2">
+                <div
+                  onClick={() => fileRef.current?.click()}
+                  className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center cursor-pointer hover:border-violet-400 hover:bg-violet-50 transition-colors"
+                >
+                  {uploading ? (
+                    <div className="flex flex-col items-center gap-2 text-violet-600">
+                      <Loader2 size={28} className="animate-spin" />
+                      <p className="text-sm font-medium">Extracting text...</p>
+                    </div>
+                  ) : resume ? (
+                    <div className="flex flex-col items-center gap-2 text-emerald-600">
+                      <FileText size={28} />
+                      <p className="text-sm font-semibold">{uploadName}</p>
+                      <p className="text-xs text-gray-400">{resume.length.toLocaleString()} characters extracted</p>
+                      <p className="text-xs text-emerald-600 font-medium">Ready to check ✓</p>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center gap-2 text-gray-400">
+                      <Upload size={28} />
+                      <p className="text-sm font-medium text-gray-600">Click to upload your resume</p>
+                      <p className="text-xs">PDF or DOCX · Max 5MB</p>
+                    </div>
+                  )}
+                </div>
+                <input
+                  ref={fileRef}
+                  type="file"
+                  className="hidden"
+                  accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                  onChange={e => { const f = e.target.files?.[0]; if (f) handleUpload(f); }}
+                />
+                {uploadError && (
+                  <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+                    <AlertCircle size={14} /> {uploadError}
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
 
@@ -221,13 +325,11 @@ function ATSCheckInner() {
 
             {/* Score + breakdown */}
             <div className="grid md:grid-cols-2 gap-6">
-              {/* Overall score */}
               <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 flex flex-col items-center justify-center gap-4">
-                <ScoreRing score={result.overallScore} />
+                <ScoreRing score={result.overallScore} onImprove={scrollToImprove} />
                 <p className="text-sm text-gray-500 text-center italic">"{result.verdict}"</p>
               </div>
 
-              {/* Breakdown */}
               <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 space-y-4">
                 <h3 className="font-bold text-gray-900 mb-2">Score Breakdown</h3>
                 <ScoreBar label="Keyword Match" score={result.breakdown.keywordMatch} />
@@ -287,7 +389,7 @@ function ATSCheckInner() {
             </div>
 
             {/* CTA to tailor */}
-            <div className="bg-gradient-to-br from-primary-700 to-violet-700 rounded-2xl p-8 text-white text-center">
+            <div id="improve-cta" className="bg-gradient-to-br from-primary-700 to-violet-700 rounded-2xl p-8 text-white text-center">
               <Zap size={32} className="mx-auto mb-3 text-yellow-300" />
               <h3 className="text-2xl font-extrabold mb-2">
                 {result.overallScore < 75 ? 'Boost Your Score with AI Tailoring' : 'Make It Even Better'}
