@@ -20,7 +20,8 @@ const QUOTES = [
 ];
 
 function StatCard({ icon: Icon, label, value, sub, color }: {
-  icon: React.FC<{ size?: number; className?: string }>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  icon: React.FC<any>;
   label: string;
   value: string | number;
   sub?: string;
