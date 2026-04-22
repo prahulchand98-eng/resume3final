@@ -37,6 +37,7 @@ Return ONLY a valid JSON object with this exact structure (no markdown, no expla
       "id": "keep original id or generate uuid",
       "company": "string",
       "title": "string",
+      "location": "string or empty string",
       "startDate": "string",
       "endDate": "string",
       "current": false,

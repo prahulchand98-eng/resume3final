@@ -104,8 +104,14 @@ function ClassicTemplate({ resume, onChange, readOnly }: TemplateProps) {
   const updateExp = (id: string, patch: Partial<ResumeData['experience'][0]>) =>
     set({ experience: resume.experience.map((e) => (e.id === id ? { ...e, ...patch } : e)) });
 
-  const contact = [resume.contact.email, resume.contact.phone, resume.contact.location,
-    resume.contact.linkedin, resume.contact.github].filter(Boolean);
+  const contact = [
+    resume.contact.email,
+    resume.contact.phone,
+    resume.contact.location,
+    resume.contact.linkedin ? resume.contact.linkedin.replace(/https?:\/\/(www\.)?linkedin\.com\/in\//i, 'linkedin.com/in/') : '',
+    resume.contact.github ? resume.contact.github.replace(/https?:\/\/(www\.)?github\.com\//i, 'github.com/') : '',
+    resume.contact.website ? resume.contact.website.replace(/https?:\/\/(www\.)?/i, '') : '',
+  ].filter(Boolean);
 
   return (
     <div className="font-sans text-gray-800" style={{ fontFamily: 'Georgia, serif' }}>
@@ -141,8 +147,11 @@ function ClassicTemplate({ resume, onChange, readOnly }: TemplateProps) {
                   <div>
                     <EditableText value={exp.title} onChange={(v) => updateExp(exp.id, { title: v })} readOnly={readOnly}
                       className="font-bold text-sm text-gray-900 block" />
-                    <EditableText value={exp.company} onChange={(v) => updateExp(exp.id, { company: v })} readOnly={readOnly}
-                      className="text-sm text-gray-600 block" />
+                    <span className="text-sm text-gray-600">
+                      <EditableText value={exp.company} onChange={(v) => updateExp(exp.id, { company: v })} readOnly={readOnly}
+                        className="inline" />
+                      {exp.location && <span className="text-gray-400"> · {exp.location}</span>}
+                    </span>
                   </div>
                   <span className="text-xs text-gray-400 ml-4 shrink-0">{exp.startDate} – {exp.current ? 'Present' : exp.endDate}</span>
                 </div>
@@ -200,128 +209,20 @@ function ClassicTemplate({ resume, onChange, readOnly }: TemplateProps) {
   );
 }
 
-// ─── Template 2: Modern ───────────────────────────────────────────────────────
-function ModernTemplate({ resume, onChange, readOnly }: TemplateProps) {
-  const set = (p: Partial<ResumeData>) => onChange({ ...resume, ...p });
-  const updateExp = (id: string, patch: Partial<ResumeData['experience'][0]>) =>
-    set({ experience: resume.experience.map((e) => (e.id === id ? { ...e, ...patch } : e)) });
-
-  const contact = [resume.contact.email, resume.contact.phone, resume.contact.location,
-    resume.contact.linkedin, resume.contact.github].filter(Boolean);
-
-  return (
-    <div className="font-sans text-gray-800" style={{ fontFamily: 'system-ui, sans-serif' }}>
-      {/* Dark header */}
-      <div className="bg-gray-900 text-white px-6 py-5 -mx-8 -mt-8 mb-5" style={{ marginLeft: '-2rem', marginRight: '-2rem', marginTop: '-2rem', paddingLeft: '2rem', paddingRight: '2rem' }}>
-        <EditableText value={resume.name} onChange={(v) => set({ name: v })} readOnly={readOnly}
-          className="text-3xl font-bold block" placeholder="Your Name" />
-        {contact.length > 0 && (
-          <p className="text-gray-300 text-sm mt-1">{contact.join('  ·  ')}</p>
-        )}
-      </div>
-      {/* Summary */}
-      {resume.summary && (
-        <div className="mb-4 pl-3 border-l-4 border-teal-500">
-          <EditableText value={resume.summary} onChange={(v) => set({ summary: v })} multiline readOnly={readOnly}
-            className="text-sm text-gray-700 leading-relaxed block" />
-        </div>
-      )}
-      {/* Skills */}
-      {resume.skills.length > 0 && (
-        <div className="mb-4">
-          <h2 className="text-xs font-bold uppercase tracking-widest text-teal-600 mb-2 flex items-center gap-2">
-            <span className="flex-1 border-t border-teal-200" />SKILLS<span className="flex-1 border-t border-teal-200" />
-          </h2>
-          <div className="flex flex-wrap gap-1.5">
-            {resume.skills.map((s) => (
-              <span key={s} className="bg-teal-50 text-teal-800 text-xs px-2 py-0.5 rounded-full border border-teal-200">{s}</span>
-            ))}
-          </div>
-        </div>
-      )}
-      {/* Experience */}
-      {resume.experience.length > 0 && (
-        <div className="mb-4">
-          <h2 className="text-xs font-bold uppercase tracking-widest text-teal-600 mb-2 flex items-center gap-2">
-            <span className="flex-1 border-t border-teal-200" />EXPERIENCE<span className="flex-1 border-t border-teal-200" />
-          </h2>
-          <div className="space-y-3">
-            {resume.experience.map((exp) => (
-              <div key={exp.id} className="pl-3 border-l-2 border-gray-200">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <EditableText value={exp.title} onChange={(v) => updateExp(exp.id, { title: v })} readOnly={readOnly}
-                      className="font-bold text-sm text-gray-900 block" />
-                    <EditableText value={exp.company} onChange={(v) => updateExp(exp.id, { company: v })} readOnly={readOnly}
-                      className="text-sm text-teal-700 block" />
-                  </div>
-                  <span className="text-xs text-gray-400 ml-4 shrink-0 bg-gray-100 px-2 py-0.5 rounded-full">
-                    {exp.startDate} – {exp.current ? 'Present' : exp.endDate}
-                  </span>
-                </div>
-                <Bullets text={exp.description} readOnly={readOnly} />
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-      {/* Education */}
-      {resume.education.length > 0 && (
-        <div className="mb-4">
-          <h2 className="text-xs font-bold uppercase tracking-widest text-teal-600 mb-2 flex items-center gap-2">
-            <span className="flex-1 border-t border-teal-200" />EDUCATION<span className="flex-1 border-t border-teal-200" />
-          </h2>
-          {resume.education.map((edu) => (
-            <div key={edu.id} className="flex items-start justify-between">
-              <div>
-                <p className="font-bold text-sm">{edu.school}</p>
-                <p className="text-sm text-gray-600">{edu.degree}{edu.field ? ` in ${edu.field}` : ''}</p>
-              </div>
-              <span className="text-xs text-gray-400 ml-4 shrink-0">{edu.startDate} – {edu.endDate}</span>
-            </div>
-          ))}
-        </div>
-      )}
-      {/* Projects */}
-      {resume.projects.length > 0 && (
-        <div className="mb-4">
-          <h2 className="text-xs font-bold uppercase tracking-widest text-teal-600 mb-2 flex items-center gap-2">
-            <span className="flex-1 border-t border-teal-200" />PROJECTS<span className="flex-1 border-t border-teal-200" />
-          </h2>
-          {resume.projects.map((p) => (
-            <div key={p.id} className="mb-2">
-              <p className="font-bold text-sm">{p.name} <span className="font-normal text-gray-500 text-xs">— {p.technologies}</span></p>
-              <p className="text-sm text-gray-700">{p.description}</p>
-            </div>
-          ))}
-        </div>
-      )}
-      {/* Certifications */}
-      {resume.certifications.length > 0 && (
-        <div>
-          <h2 className="text-xs font-bold uppercase tracking-widest text-teal-600 mb-2 flex items-center gap-2">
-            <span className="flex-1 border-t border-teal-200" />CERTIFICATIONS<span className="flex-1 border-t border-teal-200" />
-          </h2>
-          {resume.certifications.map((c) => (
-            <div key={c.id} className="flex justify-between text-sm">
-              <span className="font-medium">{c.name}</span>
-              <span className="text-gray-500">{c.issuer}{c.date ? ` · ${c.date}` : ''}</span>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ─── Template 3: Minimal ─────────────────────────────────────────────────────
+// ─── Template 2: Minimal ─────────────────────────────────────────────────────
 function MinimalTemplate({ resume, onChange, readOnly }: TemplateProps) {
   const set = (p: Partial<ResumeData>) => onChange({ ...resume, ...p });
   const updateExp = (id: string, patch: Partial<ResumeData['experience'][0]>) =>
     set({ experience: resume.experience.map((e) => (e.id === id ? { ...e, ...patch } : e)) });
 
-  const contact = [resume.contact.email, resume.contact.phone, resume.contact.location,
-    resume.contact.linkedin, resume.contact.github].filter(Boolean);
+  const contact = [
+    resume.contact.email,
+    resume.contact.phone,
+    resume.contact.location,
+    resume.contact.linkedin ? resume.contact.linkedin.replace(/https?:\/\/(www\.)?linkedin\.com\/in\//i, 'linkedin.com/in/') : '',
+    resume.contact.github ? resume.contact.github.replace(/https?:\/\/(www\.)?github\.com\//i, 'github.com/') : '',
+    resume.contact.website ? resume.contact.website.replace(/https?:\/\/(www\.)?/i, '') : '',
+  ].filter(Boolean);
 
   return (
     <div style={{ fontFamily: 'system-ui, sans-serif', color: '#1a1a1a' }}>
@@ -358,8 +259,11 @@ function MinimalTemplate({ resume, onChange, readOnly }: TemplateProps) {
                   <div>
                     <EditableText value={exp.title} onChange={(v) => updateExp(exp.id, { title: v })} readOnly={readOnly}
                       className="font-medium text-sm block" />
-                    <EditableText value={exp.company} onChange={(v) => updateExp(exp.id, { company: v })} readOnly={readOnly}
-                      className="text-xs text-gray-500 block" />
+                    <span className="text-xs text-gray-500">
+                      <EditableText value={exp.company} onChange={(v) => updateExp(exp.id, { company: v })} readOnly={readOnly}
+                        className="inline" />
+                      {exp.location && <span className="text-gray-400"> · {exp.location}</span>}
+                    </span>
                   </div>
                   <span className="text-xs text-gray-400 ml-4 shrink-0">{exp.startDate} – {exp.current ? 'Present' : exp.endDate}</span>
                 </div>
@@ -409,126 +313,13 @@ function MinimalTemplate({ resume, onChange, readOnly }: TemplateProps) {
   );
 }
 
-// ─── Template 4: Executive ───────────────────────────────────────────────────
-function ExecutiveTemplate({ resume, onChange, readOnly }: TemplateProps) {
-  const set = (p: Partial<ResumeData>) => onChange({ ...resume, ...p });
-  const updateExp = (id: string, patch: Partial<ResumeData['experience'][0]>) =>
-    set({ experience: resume.experience.map((e) => (e.id === id ? { ...e, ...patch } : e)) });
-
-  const contact = [resume.contact.email, resume.contact.phone, resume.contact.location,
-    resume.contact.linkedin, resume.contact.github].filter(Boolean);
-
-  return (
-    <div style={{ fontFamily: 'Georgia, serif', color: '#1c1c1c' }}>
-      {/* Header */}
-      <div className="mb-5 pb-4" style={{ borderBottom: '3px solid #92400e' }}>
-        <EditableText value={resume.name} onChange={(v) => set({ name: v })} readOnly={readOnly}
-          className="text-4xl font-bold tracking-tight block text-gray-900" placeholder="Your Name" />
-        {contact.length > 0 && (
-          <p className="text-xs mt-2" style={{ color: '#78350f' }}>{contact.join('   ·   ')}</p>
-        )}
-      </div>
-      {/* Summary */}
-      {resume.summary && (
-        <div className="mb-5">
-          <h2 className="font-bold text-xs uppercase tracking-widest mb-2" style={{ color: '#92400e' }}>
-            ◆ Executive Summary
-          </h2>
-          <EditableText value={resume.summary} onChange={(v) => set({ summary: v })} multiline readOnly={readOnly}
-            className="text-sm leading-relaxed block text-gray-700" />
-        </div>
-      )}
-      {/* Skills */}
-      {resume.skills.length > 0 && (
-        <div className="mb-5">
-          <h2 className="font-bold text-xs uppercase tracking-widest mb-2" style={{ color: '#92400e' }}>
-            ◆ Core Competencies
-          </h2>
-          <div className="grid grid-cols-3 gap-1">
-            {resume.skills.map((s) => (
-              <span key={s} className="text-sm text-gray-700 flex items-center gap-1">
-                <span style={{ color: '#d97706' }}>›</span> {s}
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
-      {/* Experience */}
-      {resume.experience.length > 0 && (
-        <div className="mb-5">
-          <h2 className="font-bold text-xs uppercase tracking-widest mb-3" style={{ color: '#92400e' }}>
-            ◆ Professional Experience
-          </h2>
-          <div className="space-y-4">
-            {resume.experience.map((exp) => (
-              <div key={exp.id}>
-                <div className="flex items-start justify-between">
-                  <div>
-                    <EditableText value={exp.title} onChange={(v) => updateExp(exp.id, { title: v })} readOnly={readOnly}
-                      className="font-bold text-sm block" />
-                    <EditableText value={exp.company} onChange={(v) => updateExp(exp.id, { company: v })} readOnly={readOnly}
-                      className="text-sm italic block text-amber-800" />
-                  </div>
-                  <span className="text-xs text-gray-500 ml-4 shrink-0 font-medium">{exp.startDate} – {exp.current ? 'Present' : exp.endDate}</span>
-                </div>
-                <Bullets text={exp.description} readOnly={readOnly} />
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-      {/* Education */}
-      {resume.education.length > 0 && (
-        <div className="mb-5">
-          <h2 className="font-bold text-xs uppercase tracking-widest mb-2" style={{ color: '#92400e' }}>
-            ◆ Education
-          </h2>
-          {resume.education.map((edu) => (
-            <div key={edu.id} className="flex items-start justify-between">
-              <div>
-                <p className="font-bold text-sm">{edu.school}</p>
-                <p className="text-sm italic text-gray-600">{edu.degree}{edu.field ? ` in ${edu.field}` : ''}</p>
-              </div>
-              <span className="text-xs text-gray-500 ml-4">{edu.startDate} – {edu.endDate}</span>
-            </div>
-          ))}
-        </div>
-      )}
-      {/* Projects */}
-      {resume.projects.length > 0 && (
-        <div className="mb-5">
-          <h2 className="font-bold text-xs uppercase tracking-widest mb-2" style={{ color: '#92400e' }}>◆ Notable Projects</h2>
-          {resume.projects.map((p) => (
-            <div key={p.id} className="mb-2">
-              <p className="font-bold text-sm">{p.name}</p>
-              <p className="text-sm text-gray-700">{p.description}</p>
-              <p className="text-xs text-gray-500 italic">{p.technologies}</p>
-            </div>
-          ))}
-        </div>
-      )}
-      {/* Certifications */}
-      {resume.certifications.length > 0 && (
-        <div>
-          <h2 className="font-bold text-xs uppercase tracking-widest mb-2" style={{ color: '#92400e' }}>◆ Certifications</h2>
-          {resume.certifications.map((c) => (
-            <p key={c.id} className="text-sm">{c.name} <span className="text-gray-500 italic">— {c.issuer}{c.date ? `, ${c.date}` : ''}</span></p>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
 // ─── Template registry ───────────────────────────────────────────────────────
 
-export type TemplateKey = 'classic' | 'modern' | 'minimal' | 'executive';
+export type TemplateKey = 'classic' | 'minimal';
 
 const TEMPLATES: Record<TemplateKey, { label: string; accent: string; Component: React.FC<TemplateProps> }> = {
   classic: { label: 'Classic', accent: '#4338ca', Component: ClassicTemplate },
-  modern: { label: 'Modern', accent: '#0d9488', Component: ModernTemplate },
   minimal: { label: 'Minimal', accent: '#6b7280', Component: MinimalTemplate },
-  executive: { label: 'Executive', accent: '#92400e', Component: ExecutiveTemplate },
 };
 
 // ─── Template Picker Modal ───────────────────────────────────────────────────
@@ -566,7 +357,7 @@ function TemplatePicker({
           </button>
         </div>
 
-        <div className="grid grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 gap-4">
           {(Object.entries(TEMPLATES) as [TemplateKey, typeof TEMPLATES[TemplateKey]][]).map(([key, tmpl]) => {
             const Comp = tmpl.Component;
             const isSelected = key === current;
