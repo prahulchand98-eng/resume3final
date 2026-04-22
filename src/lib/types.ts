@@ -43,6 +43,13 @@ export interface CertificationEntry {
   date: string;
 }
 
+export interface TailoringResult {
+  resume: ResumeData;
+  atsScoreBefore: number;
+  atsScoreAfter: number;
+  improvements: string[];
+}
+
 export interface ResumeData {
   name: string;
   contact: ContactInfo;

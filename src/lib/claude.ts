@@ -1,5 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk';
-import { ResumeData } from './types';
+import { ResumeData, TailoringResult } from './types';
 
 const SYSTEM_PROMPT = `You are an expert resume writer and career coach with 15+ years of experience. Your task is to tailor a candidate's resume to a specific job description.
 
@@ -19,65 +19,80 @@ CRITICAL RULES:
 
 For experience descriptions, write bullet points separated by newline characters (\\n). Start each bullet with a strong action verb. Do NOT use bullet characters — just plain text lines.
 
+Also estimate ATS (Applicant Tracking System) scores:
+- atsScoreBefore: how well the ORIGINAL resume matches the job (0-100)
+- atsScoreAfter: how well the TAILORED resume matches the job (0-100)
+- improvements: 4-6 specific changes you made (short, concrete, user-friendly phrases)
+
 Return ONLY a valid JSON object with this exact structure (no markdown, no explanation):
 {
-  "name": "string",
-  "contact": {
-    "email": "string",
-    "phone": "string",
-    "location": "string",
-    "linkedin": "string or empty string",
-    "github": "string or empty string",
-    "website": "string or empty string"
-  },
-  "summary": "string",
-  "skills": ["skill1", "skill2"],
-  "experience": [
-    {
-      "id": "keep original id or generate uuid",
-      "company": "string",
-      "title": "string",
-      "location": "string or empty string",
-      "startDate": "string",
-      "endDate": "string",
-      "current": false,
-      "description": "bullet1\\nbullet2\\nbullet3"
-    }
+  "atsScoreBefore": 35,
+  "atsScoreAfter": 87,
+  "improvements": [
+    "Added 6 keywords from job description",
+    "Rewrote summary to target the specific role",
+    "Prioritized relevant skills at the top",
+    "Strengthened action verbs in experience bullets"
   ],
-  "education": [
-    {
-      "id": "string",
-      "school": "string",
-      "degree": "string",
-      "field": "string",
-      "startDate": "string",
-      "endDate": "string",
-      "gpa": "string or empty string"
-    }
-  ],
-  "projects": [
-    {
-      "id": "string",
-      "name": "string",
-      "description": "string",
-      "technologies": "string",
-      "link": "string or empty string"
-    }
-  ],
-  "certifications": [
-    {
-      "id": "string",
-      "name": "string",
-      "issuer": "string",
-      "date": "string"
-    }
-  ]
+  "resume": {
+    "name": "string",
+    "contact": {
+      "email": "string",
+      "phone": "string",
+      "location": "string",
+      "linkedin": "string or empty string",
+      "github": "string or empty string",
+      "website": "string or empty string"
+    },
+    "summary": "string",
+    "skills": ["skill1", "skill2"],
+    "experience": [
+      {
+        "id": "keep original id or generate uuid",
+        "company": "string",
+        "title": "string",
+        "location": "string or empty string",
+        "startDate": "string",
+        "endDate": "string",
+        "current": false,
+        "description": "bullet1\\nbullet2\\nbullet3"
+      }
+    ],
+    "education": [
+      {
+        "id": "string",
+        "school": "string",
+        "degree": "string",
+        "field": "string",
+        "startDate": "string",
+        "endDate": "string",
+        "gpa": "string or empty string"
+      }
+    ],
+    "projects": [
+      {
+        "id": "string",
+        "name": "string",
+        "description": "string",
+        "technologies": "string",
+        "link": "string or empty string"
+      }
+    ],
+    "certifications": [
+      {
+        "id": "string",
+        "name": "string",
+        "issuer": "string",
+        "date": "string"
+      }
+    ]
+  }
 }`;
 
 export async function tailorResume(
   jobDescription: string,
   resumeInput: ResumeData | string
-): Promise<ResumeData> {
+): Promise<TailoringResult> {
   const client = new Anthropic({
     apiKey: process.env.ANTHROPIC_API_KEY,
   });
@@ -104,12 +119,11 @@ export async function tailorResume(
     throw new Error('Unexpected response type from Claude');
   }
 
-  // Extract JSON from the response (handle any wrapping text)
   const jsonMatch = content.text.match(/\{[\s\S]*\}/);
   if (!jsonMatch) {
     throw new Error('Claude did not return valid JSON');
   }
 
-  const parsed = JSON.parse(jsonMatch[0]) as ResumeData;
+  const parsed = JSON.parse(jsonMatch[0]) as TailoringResult;
   return parsed;
 }

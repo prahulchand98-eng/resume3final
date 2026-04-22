@@ -6,6 +6,7 @@ import Navbar from '@/components/Navbar';
 import LoadingModal from '@/components/LoadingModal';
 import ResumePreview from '@/components/ResumePreview';
 import ResumeSelector, { ResumeSource } from '@/components/ResumeSelector';
+import ATSScoreCard from '@/components/ATSScoreCard';
 import { UserProfile, ResumeData } from '@/lib/types';
 
 function CreatePageInner() {
@@ -16,6 +17,9 @@ function CreatePageInner() {
   const [resumeSource, setResumeSource] = useState<ResumeSource | null>(null);
 
   const [tailored, setTailored] = useState<ResumeData | null>(null);
+  const [atsScoreBefore, setAtsScoreBefore] = useState<number | null>(null);
+  const [atsScoreAfter, setAtsScoreAfter] = useState<number | null>(null);
+  const [improvements, setImprovements] = useState<string[]>([]);
   const [tailoring, setTailoring] = useState(false);
   const [downloading, setDownloading] = useState(false);
   const [error, setError] = useState('');
@@ -54,6 +58,9 @@ function CreatePageInner() {
         return;
       }
       setTailored(data.tailoredResume);
+      setAtsScoreBefore(data.atsScoreBefore ?? null);
+      setAtsScoreAfter(data.atsScoreAfter ?? null);
+      setImprovements(data.improvements ?? []);
       fetch('/api/auth/me').then((r) => r.json()).then(setUser);
       setTimeout(() => {
         document.getElementById('preview-section')?.scrollIntoView({ behavior: 'smooth' });
@@ -173,6 +180,16 @@ function CreatePageInner() {
         {tailored && (
           <div id="preview-section" className="space-y-4">
             <h2 className="text-xl font-bold text-gray-900">Your Tailored Resume</h2>
+
+            {/* ATS Score Card */}
+            {atsScoreBefore !== null && atsScoreAfter !== null && (
+              <ATSScoreCard
+                scoreBefore={atsScoreBefore}
+                scoreAfter={atsScoreAfter}
+                improvements={improvements}
+              />
+            )}
+
             <ResumePreview
               resume={tailored}
               onChange={setTailored}

@@ -42,15 +42,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Please provide a more detailed job description' }, { status: 400 });
   }
 
-  const tailored = await tailorResume(jobDescription, resume);
+  const result = await tailorResume(jobDescription, resume);
 
-  // Deduct 1 credit
   await prisma.user.update({
     where: { id: session.userId },
     data: { credits: { decrement: 1 } },
   });
 
-  // Save to history (7 day expiry)
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + 7);
 
@@ -59,10 +57,16 @@ export async function POST(req: NextRequest) {
       userId: session.userId,
       jobDescription,
       resumeName: resumeName || null,
-      tailoredResume: JSON.stringify(tailored),
+      tailoredResume: JSON.stringify(result.resume),
       expiresAt,
     },
   });
 
-  return NextResponse.json({ tailoredResume: tailored, historyId: history.id });
+  return NextResponse.json({
+    tailoredResume: result.resume,
+    atsScoreBefore: result.atsScoreBefore,
+    atsScoreAfter: result.atsScoreAfter,
+    improvements: result.improvements,
+    historyId: history.id,
+  });
 }

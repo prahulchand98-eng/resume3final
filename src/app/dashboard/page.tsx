@@ -4,15 +4,46 @@ import { useEffect, useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { formatDistanceToNow } from 'date-fns';
-import { Clock, Zap, Check, AlertCircle, Plus, Star } from 'lucide-react';
+import {
+  Clock, Zap, Check, AlertCircle, Plus, Star,
+  TrendingUp, FileText, ArrowRight, Sparkles, Target, Award
+} from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import { UserProfile, HistoryItem } from '@/lib/types';
+
+const QUOTES = [
+  { text: "Dream big. We help you get there.", sub: "Every great career starts with the right resume." },
+  { text: "Your next opportunity is one tailored resume away.", sub: "Let AI do the heavy lifting." },
+  { text: "Stand out from the crowd.", sub: "AI-powered resumes that speak to recruiters." },
+  { text: "Land interviews, not rejections.", sub: "Keyword-optimized. ATS-ready. You-focused." },
+  { text: "Your skills are extraordinary.", sub: "Let us make sure the world sees it." },
+];
+
+function StatCard({ icon: Icon, label, value, sub, color }: {
+  icon: React.FC<{ size?: number; className?: string }>;
+  label: string;
+  value: string | number;
+  sub?: string;
+  color: string;
+}) {
+  return (
+    <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm hover:shadow-md transition-shadow">
+      <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-3 ${color}`}>
+        <Icon size={20} className="text-white" />
+      </div>
+      <p className="text-2xl font-extrabold text-gray-900">{value}</p>
+      <p className="text-sm font-medium text-gray-700 mt-0.5">{label}</p>
+      {sub && <p className="text-xs text-gray-400 mt-1">{sub}</p>}
+    </div>
+  );
+}
 
 function DashboardInner() {
   const params = useSearchParams();
   const [user, setUser] = useState<UserProfile | null>(null);
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [quote] = useState(() => QUOTES[Math.floor(Math.random() * QUOTES.length)]);
   const upgraded = params.get('upgraded') === '1';
 
   useEffect(() => {
@@ -28,7 +59,7 @@ function DashboardInner() {
 
   if (loading || !user) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="animate-spin w-8 h-8 border-4 border-primary-600 border-t-transparent rounded-full" />
       </div>
     );
@@ -36,11 +67,16 @@ function DashboardInner() {
 
   const creditPercent = Math.round((user.credits / (user.creditsLimit || 1)) * 100);
   const planLabel = user.plan.charAt(0).toUpperCase() + user.plan.slice(1);
+  const firstName = user.name ? user.name.split(' ')[0] : null;
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
 
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar user={user} />
-      <main className="max-w-4xl mx-auto px-4 py-8 space-y-6">
+
+      <main className="max-w-5xl mx-auto px-4 py-8 space-y-6">
+
         {/* Upgrade banner */}
         {upgraded && (
           <div className="flex items-center gap-3 bg-green-50 border border-green-200 text-green-800 px-4 py-3 rounded-xl">
@@ -49,55 +85,62 @@ function DashboardInner() {
           </div>
         )}
 
-        {/* Header */}
-        <div className="flex items-start justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">
-              Welcome back{user.name ? `, ${user.name.split(' ')[0]}` : ''}!
-            </h1>
-            <p className="text-gray-500 mt-0.5">Ready to tailor your next resume?</p>
-          </div>
-          <Link href="/create" className="btn-primary flex items-center gap-2">
-            <Plus size={18} />
-            New Resume
-          </Link>
-        </div>
+        {/* Hero section */}
+        <div className="relative overflow-hidden bg-gradient-to-br from-primary-700 via-primary-600 to-violet-700 rounded-3xl p-8 text-white shadow-xl shadow-primary-200">
+          {/* Background decoration */}
+          <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-32 translate-x-32" />
+          <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-24 -translate-x-24" />
 
-        {/* Credits card */}
-        <div className="card">
-          <div className="flex items-start justify-between mb-3">
-            <div>
-              <p className="text-sm text-gray-500 font-medium mb-1">Credits Remaining</p>
-              <div className="flex items-end gap-2">
-                <span className="text-5xl font-extrabold text-gray-900">{user.credits}</span>
-                <span className="text-gray-400 text-xl mb-1">/ {user.creditsLimit}</span>
+          <div className="relative flex items-start justify-between gap-4">
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-2">
+                <Sparkles size={16} className="text-yellow-300" />
+                <span className="text-primary-200 text-sm font-medium">{greeting}{firstName ? `, ${firstName}` : ''}!</span>
+              </div>
+              <h1 className="text-3xl font-extrabold leading-tight mb-2">{quote.text}</h1>
+              <p className="text-primary-200 text-sm mb-6">{quote.sub}</p>
+
+              <div className="flex flex-wrap gap-3">
+                <Link
+                  href="/create"
+                  className="inline-flex items-center gap-2 bg-white text-primary-700 px-5 py-2.5 rounded-xl font-bold hover:bg-primary-50 transition-colors shadow-lg"
+                >
+                  <Zap size={16} />
+                  Tailor New Resume
+                </Link>
+                {user.plan === 'free' && (
+                  <Link
+                    href="/pricing"
+                    className="inline-flex items-center gap-2 bg-white/10 text-white border border-white/20 px-5 py-2.5 rounded-xl font-semibold hover:bg-white/20 transition-colors"
+                  >
+                    <Star size={16} />
+                    Upgrade Plan
+                  </Link>
+                )}
               </div>
             </div>
-            <span className="text-xs font-semibold bg-primary-100 text-primary-700 px-3 py-1 rounded-full">
-              {planLabel} Plan
-            </span>
-          </div>
-          <div className="w-full bg-gray-200 rounded-full h-2.5 mb-3">
-            <div
-              className={`h-2.5 rounded-full transition-all ${creditPercent < 20 ? 'bg-red-500' : 'bg-primary-600'}`}
-              style={{ width: `${creditPercent}%` }}
-            />
-          </div>
-          {user.credits === 0 ? (
-            <div className="flex items-center justify-between">
-              <p className="text-sm text-red-600 font-medium">No credits left</p>
-              <Link href="/pricing" className="text-sm bg-primary-600 text-white px-4 py-1.5 rounded-lg hover:bg-primary-700 font-medium flex items-center gap-1.5">
-                <Star size={14} /> Upgrade Plan
-              </Link>
+
+            {/* Credits ring */}
+            <div className="shrink-0 hidden sm:flex flex-col items-center gap-2">
+              <div className="relative w-24 h-24">
+                <svg className="w-24 h-24 -rotate-90" viewBox="0 0 96 96">
+                  <circle cx="48" cy="48" r="36" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="8" />
+                  <circle
+                    cx="48" cy="48" r="36" fill="none"
+                    stroke="white" strokeWidth="8"
+                    strokeDasharray={226}
+                    strokeDashoffset={226 - (creditPercent / 100) * 226}
+                    strokeLinecap="round"
+                  />
+                </svg>
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                  <span className="text-2xl font-extrabold">{user.credits}</span>
+                  <span className="text-[10px] text-primary-200">credits</span>
+                </div>
+              </div>
+              <span className="text-xs text-primary-200 font-medium">{planLabel} Plan</span>
             </div>
-          ) : user.plan === 'free' ? (
-            <div className="flex items-center justify-between">
-              <p className="text-sm text-gray-400">{user.credits} free resume{user.credits !== 1 ? 's' : ''} remaining</p>
-              <Link href="/pricing" className="text-sm text-primary-600 hover:text-primary-700 font-medium">
-                Upgrade for more →
-              </Link>
-            </div>
-          ) : null}
+          </div>
         </div>
 
         {/* No credits warning */}
@@ -112,64 +155,142 @@ function DashboardInner() {
           </div>
         )}
 
-        {/* Quick CTA */}
-        <div className="bg-gradient-to-r from-primary-600 to-violet-600 rounded-2xl p-6 text-white flex items-center justify-between">
-          <div>
-            <h3 className="font-bold text-lg mb-1">Tailor a resume now</h3>
-            <p className="text-primary-100 text-sm">Paste any job description — results in ~30 seconds.</p>
-          </div>
-          <Link
-            href="/create"
-            className="bg-white text-primary-700 px-5 py-2.5 rounded-lg font-semibold flex items-center gap-2 hover:bg-primary-50 transition-colors shrink-0 ml-4"
-          >
-            <Zap size={16} />
-            Start
-          </Link>
+        {/* Stats row */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <StatCard
+            icon={Zap}
+            label="Credits Left"
+            value={user.credits}
+            sub={`of ${user.creditsLimit} total`}
+            color={creditPercent < 20 ? 'bg-red-500' : 'bg-primary-600'}
+          />
+          <StatCard
+            icon={FileText}
+            label="Resumes Made"
+            value={history.length}
+            sub="in the last 7 days"
+            color="bg-violet-600"
+          />
+          <StatCard
+            icon={TrendingUp}
+            label="ATS Optimized"
+            value={`${history.length > 0 ? '100' : '0'}%`}
+            sub="of your resumes"
+            color="bg-emerald-600"
+          />
+          <StatCard
+            icon={Award}
+            label="Current Plan"
+            value={planLabel}
+            sub={user.plan === 'free' ? 'Upgrade for more' : 'Active'}
+            color="bg-amber-500"
+          />
         </div>
 
-        {/* Recent history */}
-        <div className="card">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="font-bold text-gray-900 flex items-center gap-2">
-              <Clock size={16} className="text-primary-600" />
-              Recent History
-            </h2>
-            <Link href="/history" className="text-sm text-primary-600 hover:text-primary-700 font-medium">
-              View all →
-            </Link>
-          </div>
-          {history.length === 0 ? (
-            <div className="text-center py-10">
-              <Clock size={36} className="text-gray-200 mx-auto mb-3" />
-              <p className="text-gray-400 text-sm">No tailored resumes yet.</p>
-              <Link href="/create" className="mt-2 inline-block text-sm text-primary-600 hover:text-primary-700 font-medium">
-                Create your first one →
+        {/* Main content grid */}
+        <div className="grid md:grid-cols-3 gap-6">
+
+          {/* Recent history - 2 cols */}
+          <div className="md:col-span-2 bg-white rounded-2xl border border-gray-100 shadow-sm">
+            <div className="flex items-center justify-between p-5 border-b border-gray-100">
+              <h2 className="font-bold text-gray-900 flex items-center gap-2">
+                <Clock size={16} className="text-primary-600" />
+                Recent Resumes
+              </h2>
+              <Link href="/history" className="text-sm text-primary-600 hover:text-primary-700 font-medium flex items-center gap-1">
+                View all <ArrowRight size={14} />
               </Link>
             </div>
-          ) : (
-            <ul className="space-y-2">
-              {history.map((h) => (
-                <li key={h.id} className="flex items-center justify-between p-3 rounded-lg border border-gray-100 hover:border-gray-200 transition-colors">
-                  <div className="min-w-0 flex-1">
-                    <p className="text-sm font-medium text-gray-800 truncate">
-                      {h.tailoredResume.name || 'Tailored Resume'}
-                    </p>
-                    <p className="text-xs text-gray-400 truncate mt-0.5">
-                      {h.jobDescription.substring(0, 80)}...
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-3 ml-3 shrink-0">
-                    <span className="text-xs text-gray-400">
-                      {formatDistanceToNow(new Date(h.createdAt), { addSuffix: true })}
+            {history.length === 0 ? (
+              <div className="text-center py-16 px-6">
+                <div className="w-16 h-16 bg-primary-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                  <FileText size={28} className="text-primary-400" />
+                </div>
+                <p className="font-semibold text-gray-700 mb-1">No resumes yet</p>
+                <p className="text-gray-400 text-sm mb-4">Tailor your first resume and it'll appear here.</p>
+                <Link href="/create" className="inline-flex items-center gap-2 text-sm text-primary-600 hover:text-primary-700 font-medium">
+                  <Plus size={14} /> Create your first one
+                </Link>
+              </div>
+            ) : (
+              <ul className="divide-y divide-gray-50">
+                {history.map((h) => (
+                  <li key={h.id} className="flex items-center gap-4 p-4 hover:bg-gray-50 transition-colors group">
+                    <div className="w-10 h-10 bg-primary-50 rounded-xl flex items-center justify-center shrink-0">
+                      <FileText size={18} className="text-primary-600" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm font-semibold text-gray-800 truncate">
+                        {h.tailoredResume.name || 'Tailored Resume'}
+                      </p>
+                      <p className="text-xs text-gray-400 truncate mt-0.5">
+                        {h.jobDescription.substring(0, 70)}...
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-3 shrink-0">
+                      <span className="text-xs text-gray-400 hidden sm:block">
+                        {formatDistanceToNow(new Date(h.createdAt), { addSuffix: true })}
+                      </span>
+                      <Link href="/history" className="text-xs text-primary-600 hover:text-primary-700 font-medium opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
+                        View <ArrowRight size={12} />
+                      </Link>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
+          {/* Right sidebar */}
+          <div className="space-y-4">
+            {/* Quick action */}
+            <div className="bg-gradient-to-br from-violet-600 to-primary-700 rounded-2xl p-5 text-white">
+              <Target size={22} className="mb-3 text-violet-200" />
+              <h3 className="font-bold text-lg mb-1">Ready to apply?</h3>
+              <p className="text-violet-200 text-sm mb-4">Tailor your resume to any job in under 30 seconds.</p>
+              <Link
+                href="/create"
+                className="flex items-center justify-center gap-2 bg-white text-primary-700 px-4 py-2.5 rounded-xl font-bold text-sm hover:bg-primary-50 transition-colors"
+              >
+                <Zap size={15} /> Start Tailoring
+              </Link>
+            </div>
+
+            {/* Tips */}
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5">
+              <h3 className="font-bold text-gray-900 mb-3 flex items-center gap-2">
+                <Sparkles size={15} className="text-amber-500" />
+                Pro Tips
+              </h3>
+              <ul className="space-y-3">
+                {[
+                  'Paste the full job description for best results',
+                  'Include company name in the job description',
+                  'Review and edit the AI output before applying',
+                  'Use Word (.docx) for easy editing later',
+                ].map((tip, i) => (
+                  <li key={i} className="flex items-start gap-2 text-xs text-gray-500">
+                    <span className="w-4 h-4 bg-amber-100 text-amber-700 rounded-full flex items-center justify-center shrink-0 font-bold text-[10px] mt-0.5">
+                      {i + 1}
                     </span>
-                    <Link href="/history" className="text-xs text-primary-600 hover:text-primary-700 font-medium">
-                      View →
-                    </Link>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
+                    {tip}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Upgrade nudge for free users */}
+            {user.plan === 'free' && user.credits > 0 && (
+              <div className="bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200 rounded-2xl p-5">
+                <Star size={18} className="text-amber-500 mb-2" />
+                <h3 className="font-bold text-gray-900 mb-1 text-sm">Unlock more resumes</h3>
+                <p className="text-xs text-gray-500 mb-3">You have {user.credits} free credit{user.credits !== 1 ? 's' : ''} left. Upgrade for up to 800/month.</p>
+                <Link href="/pricing" className="text-xs font-bold text-amber-700 hover:text-amber-800 flex items-center gap-1">
+                  See plans <ArrowRight size={12} />
+                </Link>
+              </div>
+            )}
+          </div>
         </div>
       </main>
     </div>
