@@ -96,13 +96,13 @@ export const PLAN_CREDITS: Record<string, number> = {
   free: 3,
   basic: 50,
   pro: 150,
-  premium: 800,
+  premium: 9999, // unlimited
 };
 
 export const PLAN_ATS_CREDITS: Record<string, number> = {
   free: 3,
   basic: 0,
-  pro: 100,
+  pro: 200,
   premium: 9999, // unlimited
 };
 

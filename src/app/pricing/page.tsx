@@ -30,7 +30,7 @@ const PLANS = [
     credits: 150,
     features: [
       '150 tailored resumes/month',
-      '100 VicksATS checks/month',
+      '200 VicksATS checks/month',
       'PDF & Word download',
       '7-day history',
       'Advanced resume builder',
@@ -43,9 +43,9 @@ const PLANS = [
     key: 'premium',
     name: 'Premium',
     price: '$35.99',
-    credits: 800,
+    credits: 9999,
     features: [
-      '800 tailored resumes/month',
+      'Unlimited tailored resumes',
       'Unlimited VicksATS checks',
       'PDF & Word download',
       '7-day history',
@@ -169,7 +169,7 @@ export default function PricingPage() {
                   <span className="text-4xl font-extrabold text-gray-900">{plan.price}</span>
                   <span className="text-gray-400 mb-1">/month</span>
                 </div>
-                <p className="text-sm text-primary-700 font-medium mt-1">{plan.credits} resumes/month</p>
+                <p className="text-sm text-primary-700 font-medium mt-1">{plan.credits >= 9999 ? 'Unlimited resumes' : `${plan.credits} resumes/month`}</p>
               </div>
 
               <ul className="space-y-2.5 flex-1 mb-6">

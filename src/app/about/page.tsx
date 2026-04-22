@@ -5,10 +5,13 @@ import Footer from '@/components/Footer';
 export default function AboutPage() {
   return (
     <div className="min-h-screen bg-white flex flex-col">
-      <header className="border-b border-gray-200 bg-white h-16 flex items-center px-6">
+      <header className="border-b border-gray-200 bg-white h-16 flex items-center justify-between px-6">
         <Link href="/" className="flex items-center gap-2">
           <div className="bg-primary-600 text-white p-1.5 rounded-lg"><Zap size={18} /></div>
           <span className="font-bold text-gray-900 text-lg">VicksResume</span>
+        </Link>
+        <Link href="/dashboard" className="flex items-center gap-1.5 text-sm text-gray-500 hover:text-primary-600 font-medium transition-colors">
+          ← Back to Dashboard
         </Link>
       </header>
 

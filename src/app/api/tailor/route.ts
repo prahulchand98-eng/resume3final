@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getRequestUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { tailorResume } from '@/lib/claude';
+import { tailorResume, pickModel } from '@/lib/claude';
 import { ResumeData } from '@/lib/types';
 import { checkRateLimit, getIp, LIMITS } from '@/lib/rate-limit';
 
@@ -25,7 +25,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Please verify your email before using this service.', code: 'EMAIL_NOT_VERIFIED' }, { status: 403 });
   }
 
-  if (user.credits <= 0) {
+  const isUnlimited = user.plan === 'premium';
+  if (!isUnlimited && user.credits <= 0) {
     return NextResponse.json(
       { error: 'No credits remaining. Please upgrade your plan.', code: 'NO_CREDITS' },
       { status: 402 }
@@ -46,12 +47,18 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Please provide a more detailed job description' }, { status: 400 });
   }
 
-  const result = await tailorResume(jobDescription, resume);
+  // Pick model based on plan and how many resumes they've made
+  const resumeCount = await prisma.resumeHistory.count({ where: { userId: session.userId } });
+  const model = pickModel(user.plan, resumeCount);
 
-  await prisma.user.update({
-    where: { id: session.userId },
-    data: { credits: { decrement: 1 } },
-  });
+  const result = await tailorResume(jobDescription, resume, model);
+
+  if (!isUnlimited) {
+    await prisma.user.update({
+      where: { id: session.userId },
+      data: { credits: { decrement: 1 } },
+    });
+  }
 
   const expiresAt = new Date();
   expiresAt.setDate(expiresAt.getDate() + 7);

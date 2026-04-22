@@ -89,9 +89,25 @@ Return ONLY a valid JSON object with this exact structure (no markdown, no expla
   }
 }`;
 
+export const MODEL_STANDARD = 'claude-opus-4-5';
+export const MODEL_HAIKU = 'claude-haiku-4-5-20251001';
+
+export function pickModel(plan: string, resumeCount: number): string {
+  if (plan === 'premium') {
+    // cycle of 3: 2 standard, 1 haiku
+    return resumeCount % 3 === 2 ? MODEL_HAIKU : MODEL_STANDARD;
+  }
+  if (plan === 'pro') {
+    // cycle of 6: 5 standard, 1 haiku
+    return resumeCount % 6 === 5 ? MODEL_HAIKU : MODEL_STANDARD;
+  }
+  return MODEL_STANDARD;
+}
+
 export async function tailorResume(
   jobDescription: string,
-  resumeInput: ResumeData | string
+  resumeInput: ResumeData | string,
+  model: string = MODEL_STANDARD
 ): Promise<TailoringResult> {
   const client = new Anthropic({
     apiKey: process.env.ANTHROPIC_API_KEY,
@@ -103,7 +119,7 @@ export async function tailorResume(
       : JSON.stringify(resumeInput, null, 2);
 
   const message = await client.messages.create({
-    model: 'claude-opus-4-5',
+    model,
     max_tokens: 4096,
     system: SYSTEM_PROMPT,
     messages: [

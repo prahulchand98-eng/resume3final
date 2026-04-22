@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getStripe, planFromPriceId } from '@/lib/stripe';
 import { prisma } from '@/lib/prisma';
-import { PLAN_CREDITS } from '@/lib/types';
+import { PLAN_CREDITS, PLAN_ATS_CREDITS } from '@/lib/types';
 
 export const runtime = 'nodejs';
 
@@ -30,11 +30,12 @@ export async function POST(req: NextRequest) {
       case 'checkout.session.completed': {
         const session = event.data.object as unknown as { metadata: { userId: string; plan: string }; customer: string; subscription: string };
         const { userId, plan } = session.metadata;
-        const credits = PLAN_CREDITS[plan] || PLAN_CREDITS.basic;
+        const credits = PLAN_CREDITS[plan] ?? PLAN_CREDITS.basic;
+        const atsCredits = PLAN_ATS_CREDITS[plan] ?? PLAN_ATS_CREDITS.basic;
 
         await prisma.user.update({
           where: { id: userId },
-          data: { plan, credits, creditsLimit: credits },
+          data: { plan, credits, creditsLimit: credits, atsCredits, atsCreditsLimit: atsCredits },
         });
 
         await prisma.subscription.upsert({
@@ -62,10 +63,11 @@ export async function POST(req: NextRequest) {
           where: { stripeSubId: invoice.subscription as string },
         });
         if (sub) {
-          const credits = PLAN_CREDITS[sub.plan] || PLAN_CREDITS.basic;
+          const credits = PLAN_CREDITS[sub.plan] ?? PLAN_CREDITS.basic;
+          const atsCredits = PLAN_ATS_CREDITS[sub.plan] ?? PLAN_ATS_CREDITS.basic;
           await prisma.user.update({
             where: { id: sub.userId },
-            data: { credits, creditsLimit: credits },
+            data: { credits, creditsLimit: credits, atsCredits, atsCreditsLimit: atsCredits },
           });
         }
         break;

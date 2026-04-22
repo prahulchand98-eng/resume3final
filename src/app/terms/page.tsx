@@ -6,11 +6,12 @@ export const metadata = { title: 'Terms of Service – VicksResume' };
 export default function TermsPage() {
   return (
     <div className="min-h-screen bg-gray-50">
-      <header className="border-b border-gray-200 bg-white h-16 flex items-center px-6">
+      <header className="border-b border-gray-200 bg-white h-16 flex items-center justify-between px-6">
         <Link href="/" className="flex items-center gap-2">
           <div className="bg-primary-600 text-white p-1.5 rounded-lg"><Zap size={18} /></div>
           <span className="font-bold text-gray-900 text-lg">VicksResume</span>
         </Link>
+        <Link href="/dashboard" className="text-sm text-gray-500 hover:text-primary-600 font-medium transition-colors">← Back to Dashboard</Link>
       </header>
 
       <main className="max-w-3xl mx-auto px-6 py-12">
