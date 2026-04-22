@@ -24,5 +24,7 @@ export async function GET(req: NextRequest) {
     atsCredits: user.atsCredits,
     atsCreditsLimit: user.atsCreditsLimit,
     plan: user.plan,
+    emailVerified: user.emailVerified,
+    referralCode: user.referralCode,
   });
 }

@@ -70,6 +70,8 @@ export interface UserProfile {
   atsCredits: number;
   atsCreditsLimit: number;
   plan: string;
+  emailVerified?: boolean;
+  referralCode?: string | null;
 }
 
 export interface SavedResume {

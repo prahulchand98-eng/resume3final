@@ -8,21 +8,29 @@ generator client {
 }
 
 model User {
-  id              String               @id @default(cuid())
-  email           String               @unique
-  password        String
-  name            String?
-  credits         Int                  @default(3)
-  creditsLimit    Int                  @default(3)
-  atsCredits      Int                  @default(3)
-  atsCreditsLimit Int                  @default(3)
-  plan            String               @default("free")
-  createdAt    DateTime             @default(now())
-  updatedAt    DateTime             @updatedAt
-  savedResumes SavedResume[]
-  history      ResumeHistory[]
-  subscription Subscription?
-  resetTokens  PasswordResetToken[]
+  id                       String               @id @default(cuid())
+  email                    String               @unique
+  password                 String
+  name                     String?
+  credits                  Int                  @default(3)
+  creditsLimit             Int                  @default(3)
+  atsCredits               Int                  @default(3)
+  atsCreditsLimit          Int                  @default(3)
+  plan                     String               @default("free")
+  isAdmin                  Boolean              @default(false)
+  emailVerified            Boolean              @default(false)
+  emailVerificationToken   String?              @unique
+  emailVerificationExpiry  DateTime?
+  referralCode             String?              @unique
+  referredBy               String?
+  createdAt                DateTime             @default(now())
+  updatedAt                DateTime             @updatedAt
+  savedResumes             SavedResume[]
+  history                  ResumeHistory[]
+  atsHistory               ATSHistory[]
+  subscription             Subscription?
+  resetTokens              PasswordResetToken[]
+  referralsMade            Referral[]           @relation("ReferrerRelation")
 }
 
 model PasswordResetToken {
@@ -39,7 +47,7 @@ model SavedResume {
   id        String   @id @default(cuid())
   userId    String
   name      String
-  content   String   // JSON stringified ResumeData
+  content   String
   isDefault Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -51,10 +59,52 @@ model ResumeHistory {
   userId         String
   jobDescription String
   resumeName     String?
-  tailoredResume String   // JSON stringified ResumeData
+  tailoredResume String
   expiresAt      DateTime
   createdAt      DateTime @default(now())
   user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model ATSHistory {
+  id             String   @id @default(cuid())
+  userId         String
+  jobDescription String
+  overallScore   Int
+  result         String   // JSON stringified ATSResult
+  createdAt      DateTime @default(now())
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Referral {
+  id             String   @id @default(cuid())
+  referrerId     String
+  referredEmail  String
+  creditGranted  Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  referrer       User     @relation("ReferrerRelation", fields: [referrerId], references: [id], onDelete: Cascade)
+}
+
+model Coupon {
+  id          String            @id @default(cuid())
+  code        String            @unique
+  credits     Int               @default(0)
+  atsCredits  Int               @default(0)
+  maxUses     Int               @default(1)
+  usedCount   Int               @default(0)
+  expiresAt   DateTime?
+  note        String?
+  createdAt   DateTime          @default(now())
+  redemptions CouponRedemption[]
+}
+
+model CouponRedemption {
+  id        String   @id @default(cuid())
+  couponId  String
+  userId    String
+  createdAt DateTime @default(now())
+  coupon    Coupon   @relation(fields: [couponId], references: [id], onDelete: Cascade)
+
+  @@unique([couponId, userId])
 }
 
 model Subscription {

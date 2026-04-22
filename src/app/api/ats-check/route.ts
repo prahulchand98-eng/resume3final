@@ -86,5 +86,15 @@ export async function POST(req: NextRequest) {
     });
   }
 
+  // Save to ATS history
+  await prisma.aTSHistory.create({
+    data: {
+      userId: session.userId,
+      jobDescription,
+      overallScore: result.overallScore,
+      result: JSON.stringify(result),
+    },
+  });
+
   return NextResponse.json(result);
 }
