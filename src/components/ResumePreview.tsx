@@ -959,7 +959,7 @@ function TemplatePicker({
 interface ResumePreviewProps {
   resume: ResumeData;
   onChange: (resume: ResumeData) => void;
-  onDownloadDocx: () => void;
+  onDownloadDocx: (template: TemplateKey) => void;
   onDownloadPdf: () => void;
   downloading?: boolean;
 }
@@ -999,7 +999,7 @@ export default function ResumePreview({
             PDF
           </button>
           <button
-            onClick={onDownloadDocx}
+            onClick={() => onDownloadDocx(template)}
             disabled={downloading}
             className="flex items-center gap-1.5 text-sm px-3 py-1.5 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 transition-colors"
           >

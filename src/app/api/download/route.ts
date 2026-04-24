@@ -9,14 +9,14 @@ export async function POST(req: NextRequest) {
   const session = await getRequestUser(req);
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
-  const { resume, format } = await req.json() as { resume: ResumeData; format: string };
+  const { resume, format, template } = await req.json() as { resume: ResumeData; format: string; template?: string };
 
   if (!resume) {
     return NextResponse.json({ error: 'Resume data is required' }, { status: 400 });
   }
 
   if (format === 'docx') {
-    const buffer = await generateDocx(resume);
+    const buffer = await generateDocx(resume, (template as 'classic' | 'minimal' | 'ats-clean' | 'ats-modern') || 'classic');
     const filename = `${(resume.name || 'resume').replace(/\s+/g, '_')}_tailored.docx`;
 
     return new NextResponse(new Uint8Array(buffer), {

@@ -40,14 +40,14 @@ export default function HistoryPage() {
     setPreviewResume(item.tailoredResume);
   };
 
-  const handleDownloadDocx = async () => {
+  const handleDownloadDocx = async (template = 'classic') => {
     if (!previewResume) return;
     setDownloading(true);
     try {
       const res = await fetch('/api/download', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ resume: previewResume, format: 'docx' }),
+        body: JSON.stringify({ resume: previewResume, format: 'docx', template }),
       });
       const blob = await res.blob();
       const url = URL.createObjectURL(blob);
@@ -81,7 +81,7 @@ export default function HistoryPage() {
     }
     const styles = Array.from(document.querySelectorAll<HTMLElement>('link[rel="stylesheet"], style'))
       .map((s) => s.outerHTML).join('');
-    printWin.document.write(`<!DOCTYPE html><html><head><title>${resumeName}</title>${styles}<style>@page{margin:0;}body{margin:0;background:white;}</style></head><body>${el.innerHTML}</body></html>`);
+    printWin.document.write(`<!DOCTYPE html><html><head><title>${resumeName}</title>${styles}<style>@page{margin:0;}body{margin:0;background:white;}.no-print{display:none!important;}</style></head><body>${el.outerHTML}</body></html>`);
     printWin.document.close();
     printWin.focus();
     setTimeout(() => { printWin.print(); printWin.close(); }, 600);
@@ -209,7 +209,7 @@ export default function HistoryPage() {
                   <Printer size={14} /> PDF
                 </button>
                 <button
-                  onClick={handleDownloadDocx}
+                  onClick={() => handleDownloadDocx()}
                   disabled={downloading}
                   className="flex items-center gap-1.5 text-sm px-3 py-1.5 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50"
                 >

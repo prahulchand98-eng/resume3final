@@ -72,14 +72,14 @@ function CreatePageInner() {
     }
   };
 
-  const handleDownloadDocx = async () => {
+  const handleDownloadDocx = async (template = 'classic') => {
     if (!tailored) return;
     setDownloading(true);
     try {
       const res = await fetch('/api/download', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ resume: tailored, format: 'docx' }),
+        body: JSON.stringify({ resume: tailored, format: 'docx', template }),
       });
       if (!res.ok) throw new Error('Download failed');
       const blob = await res.blob();
@@ -116,7 +116,7 @@ function CreatePageInner() {
     }
     const styles = Array.from(document.querySelectorAll<HTMLElement>('link[rel="stylesheet"], style'))
       .map((s) => s.outerHTML).join('');
-    printWin.document.write(`<!DOCTYPE html><html><head><title>${resumeName}</title>${styles}<style>@page{margin:0;}body{margin:0;background:white;}</style></head><body>${el.innerHTML}</body></html>`);
+    printWin.document.write(`<!DOCTYPE html><html><head><title>${resumeName}</title>${styles}<style>@page{margin:0;}body{margin:0;background:white;}.no-print{display:none!important;}</style></head><body>${el.outerHTML}</body></html>`);
     printWin.document.close();
     printWin.focus();
     setTimeout(() => { printWin.print(); printWin.close(); }, 600);
