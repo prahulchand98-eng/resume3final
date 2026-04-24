@@ -112,6 +112,7 @@ export async function generateDocx(resume: ResumeData): Promise<Buffer> {
           children: [
             new TextRun({ text: exp.company, bold: true, size: 22 }),
             new TextRun({ text: `  —  ${exp.title}`, size: 22 }),
+            ...(exp.location ? [new TextRun({ text: `  |  ${exp.location}`, size: 22, color: '6B7280' })] : []),
           ],
           spacing: { before: 120, after: 40 },
         })
