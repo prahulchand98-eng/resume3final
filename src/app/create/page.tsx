@@ -116,7 +116,7 @@ function CreatePageInner() {
     }
     const styles = Array.from(document.querySelectorAll<HTMLElement>('link[rel="stylesheet"], style'))
       .map((s) => s.outerHTML).join('');
-    printWin.document.write(`<!DOCTYPE html><html><head><title>${resumeName}</title>${styles}<style>body{margin:0;background:white;}@media print{@page{margin:1.5cm;}}</style></head><body>${el.innerHTML}</body></html>`);
+    printWin.document.write(`<!DOCTYPE html><html><head><title>${resumeName}</title>${styles}<style>@page{margin:0;}body{margin:0;background:white;}</style></head><body>${el.innerHTML}</body></html>`);
     printWin.document.close();
     printWin.focus();
     setTimeout(() => { printWin.print(); printWin.close(); }, 600);

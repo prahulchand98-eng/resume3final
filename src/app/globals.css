@@ -74,6 +74,7 @@ body {
 }
 
 /* Preserve print styles for resume printing */
+@page { margin: 0; }
 @media print {
   body * { visibility: hidden !important; }
   #resume-print, #resume-print * { visibility: visible !important; }
