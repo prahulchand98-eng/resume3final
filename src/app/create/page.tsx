@@ -97,10 +97,29 @@ function CreatePageInner() {
   };
 
   const handleDownloadPdf = () => {
-    const prev = document.title;
-    document.title = tailored?.name || 'Resume';
-    window.onafterprint = () => { document.title = prev; };
-    window.print();
+    const resumeName = tailored?.name || 'Resume';
+    const el = document.getElementById('resume-print');
+    if (!el) {
+      const prev = document.title;
+      document.title = resumeName;
+      window.onafterprint = () => { document.title = prev; };
+      window.print();
+      return;
+    }
+    const printWin = window.open('', '_blank');
+    if (!printWin) {
+      const prev = document.title;
+      document.title = resumeName;
+      window.onafterprint = () => { document.title = prev; };
+      window.print();
+      return;
+    }
+    const styles = Array.from(document.querySelectorAll<HTMLElement>('link[rel="stylesheet"], style'))
+      .map((s) => s.outerHTML).join('');
+    printWin.document.write(`<!DOCTYPE html><html><head><title>${resumeName}</title>${styles}<style>body{margin:0;background:white;}@media print{@page{margin:1.5cm;}}</style></head><body>${el.innerHTML}</body></html>`);
+    printWin.document.close();
+    printWin.focus();
+    setTimeout(() => { printWin.print(); printWin.close(); }, 600);
   };
 
   if (loading || !user) {
