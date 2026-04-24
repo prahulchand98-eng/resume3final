@@ -2,16 +2,19 @@
 
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { Zap, MailCheck, AlertCircle, RefreshCw } from 'lucide-react';
+import Image from 'next/image';
+import { MailCheck, AlertCircle, RefreshCw, Sparkles } from 'lucide-react';
 import { useState, Suspense } from 'react';
 
 function VerifyEmailContent() {
   const params = useSearchParams();
-  const error = params.get('error');
-  const [resent, setResent] = useState(false);
-  const [resending, setResending] = useState(false);
+  const error  = params.get('error');
+
+  const [resent,      setResent]      = useState(false);
+  const [resending,   setResending]   = useState(false);
   const [resendError, setResendError] = useState('');
 
+  // ── Unchanged business logic ──────────────────────────
   const handleResend = async () => {
     setResending(true);
     setResendError('');
@@ -26,61 +29,115 @@ function VerifyEmailContent() {
       setResending(false);
     }
   };
+  // ─────────────────────────────────────────────────────
+
+  const isExpired = error === 'expired';
+  const isInvalid = error === 'invalid' || error === 'missing';
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-4">
-      <div className="max-w-md w-full bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-        <div className="bg-primary-600 px-8 py-6">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="bg-white/20 p-1.5 rounded-lg"><Zap size={18} className="text-white" /></div>
-            <span className="font-bold text-white text-lg">VicksResume</span>
+    <div className="min-h-screen flex flex-col items-center justify-center px-4" style={{ background: '#F8FAFF' }}>
+
+      {/* Card */}
+      <div className="w-full max-w-md bg-white rounded-3xl border border-slate-200 shadow-card overflow-hidden">
+
+        {/* Dark header band */}
+        <div
+          className="relative px-8 pt-8 pb-10 flex flex-col items-center text-center overflow-hidden"
+          style={{ background: 'linear-gradient(145deg, #0D1B3E 0%, #152657 60%, #0F1F45 100%)' }}
+        >
+          {/* Grid overlay */}
+          <div
+            className="absolute inset-0 opacity-[0.04]"
+            style={{
+              backgroundImage:
+                'linear-gradient(rgba(91,141,239,1) 1px,transparent 1px),linear-gradient(90deg,rgba(91,141,239,1) 1px,transparent 1px)',
+              backgroundSize: '40px 40px',
+            }}
+          />
+
+          {/* Logo */}
+          <Link href="/" className="relative flex items-center gap-2 mb-6">
+            <Image src="/logo.png" alt="VicksResume" width={30} height={30} className="drop-shadow-sm" />
+            <span className="font-bold text-white text-base tracking-tight">
+              Vicks<span className="text-primary-400">Resume</span>
+            </span>
           </Link>
+
+          {/* Status icon */}
+          <div className="relative">
+            <div className="absolute inset-0 blur-2xl rounded-full opacity-40" style={{ background: 'radial-gradient(circle, #7C9CF5, transparent)' }} />
+            <div className={`relative w-16 h-16 rounded-2xl flex items-center justify-center ${
+              isExpired ? 'bg-amber-500/20' : isInvalid ? 'bg-red-500/20' : 'bg-primary-500/20'
+            }`}>
+              {isExpired || isInvalid
+                ? <AlertCircle size={30} className={isExpired ? 'text-amber-400' : 'text-red-400'} />
+                : <MailCheck size={30} className="text-primary-400" />
+              }
+            </div>
+          </div>
         </div>
+
+        {/* Body */}
         <div className="px-8 py-8 text-center">
-          {error === 'expired' ? (
+          {isExpired ? (
             <>
-              <AlertCircle size={48} className="text-amber-500 mx-auto mb-4" />
-              <h1 className="text-xl font-bold text-gray-900 mb-2">Link expired</h1>
-              <p className="text-gray-500 text-sm mb-6">Your verification link has expired. Request a new one below.</p>
+              <h1 className="text-xl font-extrabold text-slate-900 mb-2 tracking-tight">Link expired</h1>
+              <p className="text-slate-500 text-sm mb-6 leading-relaxed">
+                Your verification link has expired. Request a new one below.
+              </p>
             </>
-          ) : error === 'invalid' || error === 'missing' ? (
+          ) : isInvalid ? (
             <>
-              <AlertCircle size={48} className="text-red-500 mx-auto mb-4" />
-              <h1 className="text-xl font-bold text-gray-900 mb-2">Invalid link</h1>
-              <p className="text-gray-500 text-sm mb-6">This verification link is invalid or has already been used.</p>
+              <h1 className="text-xl font-extrabold text-slate-900 mb-2 tracking-tight">Invalid link</h1>
+              <p className="text-slate-500 text-sm mb-6 leading-relaxed">
+                This verification link is invalid or has already been used.
+              </p>
             </>
           ) : (
             <>
-              <MailCheck size={48} className="text-primary-600 mx-auto mb-4" />
-              <h1 className="text-xl font-bold text-gray-900 mb-2">Check your email</h1>
-              <p className="text-gray-500 text-sm mb-6">
-                We sent a verification link to your email. Click the link to activate your account.
+              <h1 className="text-xl font-extrabold text-slate-900 mb-2 tracking-tight">Check your email</h1>
+              <p className="text-slate-500 text-sm mb-6 leading-relaxed">
+                We sent a verification link to your email. Click it to activate your account.
                 The link expires in 24 hours.
               </p>
             </>
           )}
 
+          {/* Resend */}
           {resent ? (
-            <p className="text-green-600 text-sm font-medium">Verification email resent! Check your inbox.</p>
+            <div className="flex items-center justify-center gap-2 text-sm font-semibold text-green-600 bg-green-50 border border-green-200 px-4 py-3 rounded-xl mb-4">
+              <Sparkles size={14} />
+              Verification email sent! Check your inbox.
+            </div>
           ) : (
             <button
               onClick={handleResend}
               disabled={resending}
-              className="inline-flex items-center gap-2 text-sm text-primary-600 hover:text-primary-700 font-medium disabled:opacity-50"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-white px-6 py-3 rounded-xl shadow-brand-sm hover:shadow-brand hover:-translate-y-0.5 transition-all disabled:opacity-50 mb-4"
+              style={{ background: 'linear-gradient(135deg, #5B8DEF, #7C9CF5)' }}
             >
               <RefreshCw size={14} className={resending ? 'animate-spin' : ''} />
-              {resending ? 'Sending...' : 'Resend verification email'}
+              {resending ? 'Sending…' : 'Resend verification email'}
             </button>
           )}
-          {resendError && <p className="text-red-500 text-xs mt-2">{resendError}</p>}
 
-          <div className="mt-6 pt-6 border-t border-gray-100">
-            <Link href="/login" className="text-sm text-gray-500 hover:text-gray-700">
-              Back to login
+          {resendError && (
+            <p className="text-red-500 text-xs mb-4">{resendError}</p>
+          )}
+
+          <div className="pt-5 border-t border-slate-100">
+            <Link href="/login" className="text-sm text-slate-400 hover:text-primary-500 transition-colors font-medium">
+              ← Back to login
             </Link>
           </div>
         </div>
       </div>
+
+      {/* Footer */}
+      <p className="mt-8 text-xs text-slate-400">
+        © {new Date().getFullYear()} VicksResume ·{' '}
+        <Link href="/privacy" className="hover:text-primary-500 transition-colors">Privacy</Link>
+      </p>
     </div>
   );
 }

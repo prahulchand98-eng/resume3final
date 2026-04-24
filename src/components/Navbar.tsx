@@ -2,8 +2,9 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter, usePathname } from 'next/navigation';
-import { LayoutDashboard, Clock, Star, LogOut, Menu, X, Zap, Sparkles, Target } from 'lucide-react';
+import { LayoutDashboard, Clock, Star, LogOut, Menu, X, Sparkles, Target } from 'lucide-react';
 import { UserProfile } from '@/lib/types';
 
 interface NavbarProps {
@@ -44,10 +45,10 @@ export default function Navbar({ user }: NavbarProps) {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/dashboard" className="flex items-center gap-2">
-            <div className="bg-primary-600 text-white p-1.5 rounded-lg">
-              <Zap size={18} />
-            </div>
-            <span className="font-bold text-gray-900 text-lg">VicksResume</span>
+            <Image src="/logo.png" alt="VicksResume" width={32} height={32} className="drop-shadow-sm" />
+            <span className="font-bold text-slate-900 text-lg tracking-tight">
+              Vicks<span className="text-primary-500">Resume</span>
+            </span>
           </Link>
 
           {/* Desktop nav */}

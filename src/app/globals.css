@@ -2,59 +2,93 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+:root {
+  --brand-primary:   #5B8DEF;
+  --brand-secondary: #7C9CF5;
+  --bg:              #F8FAFF;
+  --card:            #FFFFFF;
+  --border:          #CBD5E1;
+  --text-primary:    #0F172A;
+  --text-secondary:  #64748B;
+}
 
 * {
   box-sizing: border-box;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   font-family: 'Inter', system-ui, sans-serif;
-  background-color: #f9fafb;
-  color: #111827;
+  background-color: #F8FAFF;
+  color: #0F172A;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 @layer components {
   .btn-primary {
-    @apply bg-primary-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply bg-primary-500 text-white px-5 py-2.5 rounded-xl font-semibold
+           hover:bg-primary-600 transition-all duration-200
+           disabled:opacity-50 disabled:cursor-not-allowed
+           shadow-brand-sm hover:shadow-brand;
   }
   .btn-secondary {
-    @apply bg-white text-gray-700 px-4 py-2 rounded-lg font-medium border border-gray-300 hover:bg-gray-50 transition-colors;
+    @apply bg-white text-slate-700 px-5 py-2.5 rounded-xl font-semibold
+           border border-slate-200 hover:bg-slate-50
+           hover:border-primary-300 hover:text-primary-600
+           transition-all duration-200 shadow-card;
   }
   .card {
-    @apply bg-white rounded-xl shadow-sm border border-gray-200 p-6;
+    @apply bg-white rounded-2xl shadow-card border border-slate-200 p-6;
   }
   .input {
-    @apply w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent;
+    @apply w-full border border-slate-200 rounded-xl px-4 py-2.5 text-sm
+           text-slate-900 placeholder:text-slate-400
+           focus:outline-none focus:ring-2 focus:ring-primary-500/20
+           focus:border-primary-400 transition-all duration-200 bg-white;
   }
   .label {
-    @apply block text-sm font-medium text-gray-700 mb-1;
+    @apply block text-sm font-semibold text-slate-700 mb-2;
+  }
+  .section-badge {
+    @apply inline-block text-sm font-semibold text-primary-600
+           bg-primary-50 px-4 py-1.5 rounded-full mb-4
+           border border-primary-100;
+  }
+  .gradient-text {
+    background: linear-gradient(135deg, #5B8DEF 0%, #7C9CF5 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .gradient-btn {
+    background: linear-gradient(135deg, #5B8DEF 0%, #7C9CF5 100%);
+    @apply text-white font-semibold rounded-xl transition-all duration-200
+           shadow-brand-sm hover:shadow-brand hover:-translate-y-0.5;
   }
 }
 
-/* Resume-only print — hides entire page, shows only #resume-print */
+/* Preserve print styles for resume printing */
 @media print {
-  body * {
-    visibility: hidden !important;
-  }
-  #resume-print,
-  #resume-print * {
-    visibility: visible !important;
-  }
-  /* position:absolute (not fixed) lets content flow across pages without overlapping */
+  body * { visibility: hidden !important; }
+  #resume-print, #resume-print * { visibility: visible !important; }
   #resume-print {
     position: absolute !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    height: auto !important;
-    width: 100% !important;
-    margin: 0 !important;
-    padding: 1cm 1.5cm !important;
-    box-shadow: none !important;
-    border: none !important;
-    border-radius: 0 !important;
-    background: white !important;
+    top: 0 !important; left: 0 !important; right: 0 !important;
+    height: auto !important; width: 100% !important;
+    margin: 0 !important; padding: 1cm 1.5cm !important;
+    box-shadow: none !important; border: none !important;
+    border-radius: 0 !important; background: white !important;
     overflow: visible !important;
   }
+}
+
+/* Radix Tabs active indicator */
+[data-state='active'] {
+  outline: none;
 }
