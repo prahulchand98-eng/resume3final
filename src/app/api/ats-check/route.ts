@@ -100,7 +100,7 @@ export async function POST(req: NextRequest) {
     data: {
       userId: session.userId,
       jobDescription,
-      overallScore: result.overallScore,
+      overallScore: (result.overallScore as number) ?? 0,
       result: JSON.stringify(result),
     },
   });
