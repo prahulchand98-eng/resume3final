@@ -6,9 +6,9 @@ import { ResumeData, emptyResume } from '@/lib/types';
 import ResumeBuilder from './ResumeBuilder';
 
 export type ResumeSource =
-  | { type: 'upload'; text: string }
-  | { type: 'paste'; text: string }
-  | { type: 'build'; data: ResumeData };
+  | { type: 'upload'; text: string; name: string }
+  | { type: 'paste';  text: string; name?: undefined }
+  | { type: 'build';  data: ResumeData; name: string };
 
 type Mode = 'upload' | 'paste' | 'build';
 
@@ -52,7 +52,7 @@ export default function ResumeSelector({ value, onChange }: ResumeSelectorProps)
       const data = await res.json();
       if (!res.ok) throw new Error(data.error);
       setUploadText(data.text);
-      onChange({ type: 'upload', text: data.text });
+      onChange({ type: 'upload', text: data.text, name: file.name.replace(/\.[^.]+$/, '') });
     } catch (err: unknown) {
       setUploadError(err instanceof Error ? err.message : 'Upload failed');
     } finally {
@@ -152,7 +152,7 @@ export default function ResumeSelector({ value, onChange }: ResumeSelectorProps)
             value={buildData}
             onChange={(data) => {
               setBuildData(data);
-              onChange({ type: 'build', data });
+              onChange({ type: 'build', data, name: data.name || 'Built Resume' });
             }}
           />
         </div>

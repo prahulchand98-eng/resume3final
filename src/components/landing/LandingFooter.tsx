@@ -6,10 +6,10 @@ import { Mail, FileText, Info, MessageSquare } from 'lucide-react';
 import { useState } from 'react';
 
 const PRODUCT_LINKS = [
-  { label: 'Resume Tailoring', href: '/create' },
-  { label: 'ATS Score Checker', href: '/ats-check' },
+  { label: 'Resume Tailoring', href: '/login' },
+  { label: 'ATS Score Checker', href: '/login' },
   { label: 'Pricing',           href: '/pricing' },
-  { label: 'Dashboard',         href: '/dashboard' },
+  { label: 'Dashboard',         href: '/login' },
 ];
 
 const COMPANY_LINKS = [

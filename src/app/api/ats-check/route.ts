@@ -64,23 +64,28 @@ export async function POST(req: NextRequest) {
 
   const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
-  const message = await client.messages.create({
-    model: 'claude-haiku-4-5-20251001',
-    max_tokens: 2048,
-    system: ATS_PROMPT,
-    messages: [{
-      role: 'user',
-      content: `JOB DESCRIPTION:\n${jobDescription}\n\n---\n\nRESUME:\n${resume}\n\n---\n\nAnalyze this resume against the job description. Return only the JSON object.`,
-    }],
-  });
+  let result: Record<string, unknown>;
+  try {
+    const message = await client.messages.create({
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 2048,
+      system: ATS_PROMPT,
+      messages: [{
+        role: 'user',
+        content: `JOB DESCRIPTION:\n${jobDescription}\n\n---\n\nRESUME:\n${resume}\n\n---\n\nAnalyze this resume against the job description. Return only the JSON object.`,
+      }],
+    });
 
-  const content = message.content[0];
-  if (content.type !== 'text') throw new Error('Unexpected response');
+    const content = message.content[0];
+    if (content.type !== 'text') throw new Error('Unexpected response type');
 
-  const jsonMatch = content.text.match(/\{[\s\S]*\}/);
-  if (!jsonMatch) throw new Error('Invalid response');
+    const jsonMatch = content.text.match(/\{[\s\S]*\}/);
+    if (!jsonMatch) throw new Error('No JSON in response');
 
-  const result = JSON.parse(jsonMatch[0]);
+    result = JSON.parse(jsonMatch[0]);
+  } catch {
+    return NextResponse.json({ error: 'ATS analysis failed. Please try again.' }, { status: 502 });
+  }
 
   // Deduct 1 ATS credit (9999 = unlimited, don't deduct)
   if (user.atsCredits < 9999) {

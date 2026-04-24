@@ -48,7 +48,7 @@ function CreatePageInner() {
       const res = await fetch('/api/tailor', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ jobDescription, resume: resumePayload }),
+        body: JSON.stringify({ jobDescription, resume: resumePayload, resumeName: resumeSource.name }),
       });
       const data = await res.json();
       if (!res.ok) {

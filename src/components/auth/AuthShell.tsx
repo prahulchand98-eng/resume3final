@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, ArrowLeft } from 'lucide-react';
 
 interface AuthShellProps {
   children: React.ReactNode;
@@ -109,7 +109,16 @@ export default function AuthShell({ children, quote = "I'm gonna rewrite your re
       {/* ══════════════════════════════════════
           RIGHT PANEL  —  form area
       ══════════════════════════════════════ */}
-      <div className="flex-1 flex flex-col items-center justify-center px-6 py-12">
+      <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 relative">
+
+        {/* Back to homepage */}
+        <Link
+          href="/"
+          className="absolute top-6 left-6 flex items-center gap-1.5 text-sm text-slate-400 hover:text-primary-600 transition-colors font-medium"
+        >
+          <ArrowLeft size={15} />
+          Home
+        </Link>
 
         {/* Mobile-only logo */}
         <Link href="/" className="flex items-center gap-2 mb-8 lg:hidden">

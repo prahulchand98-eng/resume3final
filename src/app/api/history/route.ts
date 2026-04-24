@@ -22,6 +22,8 @@ export async function GET(req: NextRequest) {
       jobDescription: h.jobDescription,
       resumeName: h.resumeName,
       tailoredResume: JSON.parse(h.tailoredResume),
+      atsScoreBefore: h.atsScoreBefore,
+      atsScoreAfter: h.atsScoreAfter,
       createdAt: h.createdAt.toISOString(),
       expiresAt: h.expiresAt.toISOString(),
     }))

@@ -116,12 +116,28 @@ export default function HistoryPage() {
                           {item.resumeName ? ` · Based on: ${item.resumeName}` : ''}
                         </p>
                       </div>
-                      <div className={`shrink-0 text-xs font-medium px-2 py-0.5 rounded-full ${
-                        daysLeft <= 1 ? 'bg-red-100 text-red-600' :
-                        daysLeft <= 3 ? 'bg-amber-100 text-amber-600' :
-                        'bg-gray-100 text-gray-500'
-                      }`}>
-                        {daysLeft}d left
+                      <div className="flex items-center gap-2 shrink-0">
+                        {item.atsScoreAfter > 0 && (
+                          <div className={`text-xs font-bold px-2 py-0.5 rounded-full ${
+                            item.atsScoreAfter >= 75 ? 'bg-green-100 text-green-700' :
+                            item.atsScoreAfter >= 50 ? 'bg-amber-100 text-amber-700' :
+                            'bg-red-100 text-red-700'
+                          }`}>
+                            ATS {item.atsScoreAfter}
+                            {item.atsScoreBefore > 0 && (
+                              <span className="text-[10px] font-normal opacity-70 ml-1">
+                                (+{item.atsScoreAfter - item.atsScoreBefore})
+                              </span>
+                            )}
+                          </div>
+                        )}
+                        <div className={`text-xs font-medium px-2 py-0.5 rounded-full ${
+                          daysLeft <= 1 ? 'bg-red-100 text-red-600' :
+                          daysLeft <= 3 ? 'bg-amber-100 text-amber-600' :
+                          'bg-gray-100 text-gray-500'
+                        }`}>
+                          {daysLeft}d left
+                        </div>
                       </div>
                     </div>
                     <p className="text-sm text-gray-500 mt-2 line-clamp-2">

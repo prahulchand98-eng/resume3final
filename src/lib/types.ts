@@ -88,6 +88,8 @@ export interface HistoryItem {
   jobDescription: string;
   resumeName?: string | null;
   tailoredResume: ResumeData;
+  atsScoreBefore: number;
+  atsScoreAfter: number;
   createdAt: string;
   expiresAt: string;
 }

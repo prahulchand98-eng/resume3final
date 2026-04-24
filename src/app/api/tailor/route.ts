@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getRequestUser } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
-import { tailorResume, pickModel } from '@/lib/claude';
+import { tailorResume, scoreResume, pickModel } from '@/lib/claude';
 import { ResumeData } from '@/lib/types';
 import { checkRateLimit, getIp, LIMITS } from '@/lib/rate-limit';
 
@@ -51,8 +51,23 @@ export async function POST(req: NextRequest) {
   const resumeCount = await prisma.resumeHistory.count({ where: { userId: session.userId } });
   const model = pickModel(user.plan, resumeCount);
 
-  const result = await tailorResume(jobDescription, resume, model);
+  // Step 1: Opus — tailor the resume (must succeed before scoring)
+  let result: Awaited<ReturnType<typeof tailorResume>>;
+  try {
+    result = await tailorResume(jobDescription, resume, model);
+  } catch {
+    return NextResponse.json({ error: 'Resume tailoring failed. Please try again.' }, { status: 502 });
+  }
 
+  // Step 2: Haiku — score both resumes (only runs after Opus succeeds)
+  let scores: { atsScoreBefore: number; atsScoreAfter: number };
+  try {
+    scores = await scoreResume(jobDescription, resume, result.resume);
+  } catch {
+    return NextResponse.json({ error: 'ATS scoring failed. Please try again.' }, { status: 502 });
+  }
+
+  // Both succeeded — now deduct credit and save
   if (!isUnlimited) {
     await prisma.user.update({
       where: { id: session.userId },
@@ -60,8 +75,9 @@ export async function POST(req: NextRequest) {
     });
   }
 
+  const EXPIRY_DAYS: Record<string, number> = { free: 7, basic: 14, pro: 30, premium: 365 };
   const expiresAt = new Date();
-  expiresAt.setDate(expiresAt.getDate() + 7);
+  expiresAt.setDate(expiresAt.getDate() + (EXPIRY_DAYS[user.plan] ?? 7));
 
   const history = await prisma.resumeHistory.create({
     data: {
@@ -69,14 +85,16 @@ export async function POST(req: NextRequest) {
       jobDescription,
       resumeName: resumeName || null,
       tailoredResume: JSON.stringify(result.resume),
+      atsScoreBefore: scores.atsScoreBefore,
+      atsScoreAfter: scores.atsScoreAfter,
       expiresAt,
     },
   });
 
   return NextResponse.json({
     tailoredResume: result.resume,
-    atsScoreBefore: result.atsScoreBefore,
-    atsScoreAfter: result.atsScoreAfter,
+    atsScoreBefore: scores.atsScoreBefore,
+    atsScoreAfter: scores.atsScoreAfter,
     improvements: result.improvements,
     historyId: history.id,
   });
