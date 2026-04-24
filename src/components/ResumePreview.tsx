@@ -313,13 +313,215 @@ function MinimalTemplate({ resume, onChange, readOnly }: TemplateProps) {
   );
 }
 
+// ─── Template 3: ATS Clean ───────────────────────────────────────────────────
+function ATSCleanTemplate({ resume, onChange, readOnly }: TemplateProps) {
+  const set = (p: Partial<ResumeData>) => onChange({ ...resume, ...p });
+  const updateExp = (id: string, patch: Partial<ResumeData['experience'][0]>) =>
+    set({ experience: resume.experience.map((e) => (e.id === id ? { ...e, ...patch } : e)) });
+
+  const contact = [
+    resume.contact.email, resume.contact.phone, resume.contact.location,
+    resume.contact.linkedin ? resume.contact.linkedin.replace(/https?:\/\/(www\.)?linkedin\.com\/in\//i, 'linkedin.com/in/') : '',
+    resume.contact.github   ? resume.contact.github.replace(/https?:\/\/(www\.)?github\.com\//i, 'github.com/') : '',
+  ].filter(Boolean);
+
+  const Heading = ({ title }: { title: string }) => (
+    <div className="mb-2">
+      <p className="text-xs font-bold uppercase tracking-widest text-gray-900">{title}</p>
+      <div style={{ borderTop: '1.5px solid #111', marginTop: 2 }} />
+    </div>
+  );
+
+  return (
+    <div style={{ fontFamily: 'Arial, Helvetica, sans-serif', color: '#111', fontSize: 13 }}>
+      <div className="text-center mb-3">
+        <EditableText value={resume.name} onChange={(v) => set({ name: v })} readOnly={readOnly}
+          className="text-2xl font-bold block tracking-tight" placeholder="Your Name" />
+        {contact.length > 0 && <p className="text-xs mt-1 text-gray-600">{contact.join('  |  ')}</p>}
+      </div>
+      <div style={{ borderTop: '2px solid #111', marginBottom: 12 }} />
+
+      {resume.summary && (
+        <div className="mb-3"><Heading title="Professional Summary" />
+          <EditableText value={resume.summary} onChange={(v) => set({ summary: v })} multiline readOnly={readOnly}
+            className="text-sm leading-relaxed block" />
+        </div>
+      )}
+      {resume.skills.length > 0 && (
+        <div className="mb-3"><Heading title="Skills" />
+          <p className="text-sm">{resume.skills.join(', ')}</p>
+        </div>
+      )}
+      {resume.experience.length > 0 && (
+        <div className="mb-3"><Heading title="Work Experience" />
+          <div className="space-y-3">
+            {resume.experience.map((exp) => (
+              <div key={exp.id}>
+                <div className="flex justify-between items-start">
+                  <div>
+                    <EditableText value={exp.title} onChange={(v) => updateExp(exp.id, { title: v })} readOnly={readOnly}
+                      className="font-bold text-sm block" />
+                    <EditableText value={exp.company} onChange={(v) => updateExp(exp.id, { company: v })} readOnly={readOnly}
+                      className="text-sm block" />
+                  </div>
+                  <span className="text-xs ml-4 shrink-0 text-gray-700">{exp.startDate} – {exp.current ? 'Present' : exp.endDate}</span>
+                </div>
+                <Bullets text={exp.description} readOnly={readOnly} />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      {resume.education.length > 0 && (
+        <div className="mb-3"><Heading title="Education" />
+          {resume.education.map((edu) => (
+            <div key={edu.id} className="flex justify-between items-start text-sm">
+              <div>
+                <p className="font-bold">{edu.school}</p>
+                <p>{edu.degree}{edu.field ? ` in ${edu.field}` : ''}{edu.gpa ? ` — GPA: ${edu.gpa}` : ''}</p>
+              </div>
+              <span className="text-xs ml-4 shrink-0 text-gray-700">{edu.startDate} – {edu.endDate}</span>
+            </div>
+          ))}
+        </div>
+      )}
+      {resume.projects.length > 0 && (
+        <div className="mb-3"><Heading title="Projects" />
+          {resume.projects.map((p) => (
+            <div key={p.id} className="mb-1.5">
+              <p className="font-bold text-sm">{p.name} <span className="font-normal text-gray-700">| {p.technologies}</span></p>
+              <p className="text-sm">{p.description}</p>
+            </div>
+          ))}
+        </div>
+      )}
+      {resume.certifications.length > 0 && (
+        <div><Heading title="Certifications" />
+          {resume.certifications.map((c) => (
+            <div key={c.id} className="flex justify-between text-sm">
+              <span className="font-bold">{c.name}</span>
+              <span className="text-gray-600">{c.issuer}{c.date ? ` · ${c.date}` : ''}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ─── Template 4: ATS Modern ──────────────────────────────────────────────────
+function ATSModernTemplate({ resume, onChange, readOnly }: TemplateProps) {
+  const set = (p: Partial<ResumeData>) => onChange({ ...resume, ...p });
+  const updateExp = (id: string, patch: Partial<ResumeData['experience'][0]>) =>
+    set({ experience: resume.experience.map((e) => (e.id === id ? { ...e, ...patch } : e)) });
+
+  const contact = [
+    resume.contact.email, resume.contact.phone, resume.contact.location,
+    resume.contact.linkedin ? resume.contact.linkedin.replace(/https?:\/\/(www\.)?linkedin\.com\/in\//i, 'linkedin.com/in/') : '',
+    resume.contact.github   ? resume.contact.github.replace(/https?:\/\/(www\.)?github\.com\//i, 'github.com/') : '',
+  ].filter(Boolean);
+
+  const Heading = ({ title }: { title: string }) => (
+    <div className="flex items-center gap-2 mb-3">
+      <div style={{ width: 3, height: 14, background: '#1d4ed8', borderRadius: 2, flexShrink: 0 }} />
+      <span className="text-[10px] font-bold uppercase tracking-widest text-blue-800">{title}</span>
+      <div style={{ flex: 1, height: 1, background: '#bfdbfe' }} />
+    </div>
+  );
+
+  return (
+    <div style={{ fontFamily: 'system-ui, Calibri, sans-serif', color: '#1e293b', fontSize: 13 }}>
+      <div className="mb-4">
+        <EditableText value={resume.name} onChange={(v) => set({ name: v })} readOnly={readOnly}
+          className="text-3xl font-bold text-slate-900 tracking-tight block" placeholder="Your Name" />
+        {contact.length > 0 && <p className="text-xs text-slate-500 mt-1">{contact.join('  ·  ')}</p>}
+        <div style={{ height: 2, background: 'linear-gradient(90deg, #1d4ed8 0%, #93c5fd 100%)', borderRadius: 1, marginTop: 8 }} />
+      </div>
+
+      {resume.summary && (
+        <div className="mb-4"><Heading title="Professional Summary" />
+          <EditableText value={resume.summary} onChange={(v) => set({ summary: v })} multiline readOnly={readOnly}
+            className="text-sm text-slate-600 leading-relaxed block" />
+        </div>
+      )}
+      {resume.skills.length > 0 && (
+        <div className="mb-4"><Heading title="Core Skills" />
+          <div className="flex flex-wrap gap-x-4 gap-y-0.5">
+            {resume.skills.map((s, i) => (
+              <span key={i} className="text-sm text-slate-700">• {s}</span>
+            ))}
+          </div>
+        </div>
+      )}
+      {resume.experience.length > 0 && (
+        <div className="mb-4"><Heading title="Work Experience" />
+          <div className="space-y-3">
+            {resume.experience.map((exp) => (
+              <div key={exp.id}>
+                <div className="flex justify-between items-start">
+                  <div>
+                    <EditableText value={exp.title} onChange={(v) => updateExp(exp.id, { title: v })} readOnly={readOnly}
+                      className="font-bold text-sm text-slate-900 block" />
+                    <span className="text-xs text-slate-500">
+                      <EditableText value={exp.company} onChange={(v) => updateExp(exp.id, { company: v })} readOnly={readOnly}
+                        className="inline" />
+                      {exp.location && <span className="text-slate-400"> · {exp.location}</span>}
+                    </span>
+                  </div>
+                  <span className="text-xs text-slate-400 ml-4 shrink-0">{exp.startDate} – {exp.current ? 'Present' : exp.endDate}</span>
+                </div>
+                <Bullets text={exp.description} readOnly={readOnly} />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      {resume.education.length > 0 && (
+        <div className="mb-4"><Heading title="Education" />
+          {resume.education.map((edu) => (
+            <div key={edu.id} className="flex justify-between items-start">
+              <div>
+                <p className="font-bold text-sm text-slate-900">{edu.school}</p>
+                <p className="text-xs text-slate-500">{edu.degree}{edu.field ? ` in ${edu.field}` : ''}{edu.gpa ? ` — GPA: ${edu.gpa}` : ''}</p>
+              </div>
+              <span className="text-xs text-slate-400 ml-4 shrink-0">{edu.startDate} – {edu.endDate}</span>
+            </div>
+          ))}
+        </div>
+      )}
+      {resume.projects.length > 0 && (
+        <div className="mb-4"><Heading title="Projects" />
+          {resume.projects.map((p) => (
+            <div key={p.id} className="mb-2">
+              <p className="font-bold text-sm text-slate-900">{p.name} <span className="font-normal text-slate-500">| {p.technologies}</span></p>
+              <p className="text-xs text-slate-600">{p.description}</p>
+            </div>
+          ))}
+        </div>
+      )}
+      {resume.certifications.length > 0 && (
+        <div><Heading title="Certifications" />
+          {resume.certifications.map((c) => (
+            <div key={c.id} className="flex justify-between text-sm">
+              <span className="font-semibold text-slate-800">{c.name}</span>
+              <span className="text-slate-500">{c.issuer}{c.date ? ` · ${c.date}` : ''}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── Template registry ───────────────────────────────────────────────────────
 
-export type TemplateKey = 'classic' | 'minimal';
+export type TemplateKey = 'classic' | 'minimal' | 'ats-clean' | 'ats-modern';
 
-const TEMPLATES: Record<TemplateKey, { label: string; accent: string; Component: React.FC<TemplateProps> }> = {
-  classic: { label: 'Classic', accent: '#4338ca', Component: ClassicTemplate },
-  minimal: { label: 'Minimal', accent: '#6b7280', Component: MinimalTemplate },
+const TEMPLATES: Record<TemplateKey, { label: string; accent: string; badge?: string; Component: React.FC<TemplateProps> }> = {
+  classic:    { label: 'Classic',      accent: '#4338ca', Component: ClassicTemplate },
+  minimal:    { label: 'Minimal',      accent: '#6b7280', Component: MinimalTemplate },
+  'ats-clean':  { label: 'ATS Clean',  accent: '#111',    badge: '100% ATS', Component: ATSCleanTemplate },
+  'ats-modern': { label: 'ATS Modern', accent: '#1d4ed8', badge: '100% ATS', Component: ATSModernTemplate },
 };
 
 // ─── Template Picker Modal ───────────────────────────────────────────────────
@@ -398,7 +600,14 @@ function TemplatePicker({
                   <span className="text-sm font-semibold" style={{ color: isSelected ? tmpl.accent : '#374151' }}>
                     {tmpl.label}
                   </span>
-                  {isSelected && <CheckCircle size={14} style={{ color: tmpl.accent }} />}
+                  <div className="flex items-center gap-1.5">
+                    {tmpl.badge && (
+                      <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-green-100 text-green-700">
+                        {tmpl.badge}
+                      </span>
+                    )}
+                    {isSelected && <CheckCircle size={14} style={{ color: tmpl.accent }} />}
+                  </div>
                 </div>
               </div>
             );

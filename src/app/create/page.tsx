@@ -96,7 +96,12 @@ function CreatePageInner() {
     }
   };
 
-  const handleDownloadPdf = () => window.print();
+  const handleDownloadPdf = () => {
+    const prev = document.title;
+    document.title = tailored?.name || 'Resume';
+    window.onafterprint = () => { document.title = prev; };
+    window.print();
+  };
 
   if (loading || !user) {
     return (

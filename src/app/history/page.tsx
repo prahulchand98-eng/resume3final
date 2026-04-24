@@ -61,7 +61,12 @@ export default function HistoryPage() {
     }
   };
 
-  const handleDownloadPdf = () => window.print();
+  const handleDownloadPdf = () => {
+    const prev = document.title;
+    document.title = previewResume?.name || 'Resume';
+    window.onafterprint = () => { document.title = prev; };
+    window.print();
+  };
 
   const getDaysLeft = (expiresAt: string) => {
     const days = differenceInDays(new Date(expiresAt), new Date());
