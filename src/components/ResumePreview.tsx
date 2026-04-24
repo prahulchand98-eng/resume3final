@@ -68,7 +68,7 @@ function EditableText({
   return (
     <span
       onClick={() => { setDraft(value); setEditing(true); }}
-      className={`group relative cursor-pointer rounded hover:bg-primary-50 hover:outline hover:outline-1 hover:outline-primary-300 transition-all inline-block w-full ${className}`}
+      className={`group relative cursor-pointer rounded hover:bg-primary-50 hover:outline hover:outline-1 hover:outline-primary-300 transition-all inline-block ${className}`}
     >
       {value || <span className="text-gray-300 italic text-xs">{placeholder || 'Click to edit'}</span>}
       <Edit2 size={10} className="absolute right-0.5 top-0.5 opacity-0 group-hover:opacity-60 text-primary-500" />
